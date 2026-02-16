@@ -1,13 +1,4 @@
 
-functions{
-  real cont_binomial_lpdf(real k, real p, real N) {
-    return lgamma (N+1) - lgamma (k+1) -lgamma (N-k+1) + k*log(p) + (N-k)*log(1-p);
-  }
-  real scaled_beta_lpdf(real k, real alpha, real beta, real N) {
-    return (alpha-1)*log(k) + (beta-1)*log(N-k) - (alpha+beta-1)*log(N) - lbeta(alpha,beta);
-  }
-}
-
 data {
   int<lower=1> T;
   vector<lower=0>[T] A;
