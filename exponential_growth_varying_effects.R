@@ -124,7 +124,7 @@ grid.arrange(gg_def_N0)
 gg_def_mu_lar <- ggplot(data.frame(draw=expgro_def_draws$`mu_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lar, sd=psd_mu_lar), colour="black", linewidth=1) +
-  xlim(pm_mu_lar - 6*psd_mu_lar, pm_mu_lar + 6*psd_mu_lar) +
+  xlim(min(pm_mu_lar - 6*psd_mu_lar, min(expgro_def_draws$`mu_lar`)), max(pm_mu_lar + 6*psd_mu_lar, max(expgro_def_draws$`mu_lar`))) +
   geom_vline(xintercept = mu_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lar}$"),
@@ -134,7 +134,7 @@ gg_def_mu_lar <- ggplot(data.frame(draw=expgro_def_draws$`mu_lar`)) +
 gg_def_sigma_lar <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lar, sd=psd_sigma_lar), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), pm_sigma_lar + 6*psd_sigma_lar) +
+  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), max(pm_sigma_lar + 6*psd_sigma_lar, max(expgro_def_draws$`sigma_lar`))) +
   geom_vline(xintercept = sigma_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lar}$"),
@@ -144,7 +144,7 @@ gg_def_sigma_lar <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lar`)) +
 gg_def_mu_lbr <-ggplot(data.frame(draw=expgro_def_draws$`mu_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lbr, sd=psd_mu_lbr), colour="black", linewidth=1) +
-  xlim(pm_mu_lbr[1] - 6*psd_mu_lbr, pm_mu_lbr + 6*psd_mu_lbr) +
+  xlim(min(pm_mu_lbr - 6*psd_mu_lbr, min(expgro_def_draws$`mu_lbr`)), max(pm_mu_lbr + 6*psd_mu_lbr, max(expgro_def_draws$`mu_lbr`))) +
   geom_vline(xintercept = mu_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lbr}$"),
@@ -154,7 +154,7 @@ gg_def_mu_lbr <-ggplot(data.frame(draw=expgro_def_draws$`mu_lbr`)) +
 gg_def_sigma_lbr <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lbr, sd=psd_sigma_lbr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), pm_sigma_lbr + 6*psd_sigma_lbr) +
+  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), max(pm_sigma_lbr + 6*psd_sigma_lbr, max(expgro_def_draws$`sigma_lbr`))) +
   geom_vline(xintercept = sigma_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lbr}$"),
@@ -164,7 +164,7 @@ gg_def_sigma_lbr <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lbr`)) +
 gg_def_mu_lfr <- ggplot(data.frame(draw=expgro_def_draws$`mu_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lfr, sd=psd_mu_lfr), colour="black", linewidth=1) +
-  xlim(pm_mu_lfr - 6*psd_mu_lfr, pm_mu_lfr + 6*psd_mu_lfr) +
+  xlim(min(pm_mu_lfr - 6*psd_mu_lfr, min(expgro_def_draws$`mu_lfr`)), max(pm_mu_lfr + 6*psd_mu_lfr, max(expgro_def_draws$`mu_lfr`))) +
   geom_vline(xintercept = mu_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lfr}$"),
@@ -174,7 +174,7 @@ gg_def_mu_lfr <- ggplot(data.frame(draw=expgro_def_draws$`mu_lfr`)) +
 gg_def_sigma_lfr <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lfr, sd=psd_sigma_lfr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), pm_sigma_lfr + 6*psd_sigma_lfr) +
+  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), max(pm_sigma_lfr + 6*psd_sigma_lfr, max(expgro_def_draws$`sigma_lfr`))) +
   geom_vline(xintercept = sigma_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lfr}$"),
@@ -265,7 +265,7 @@ gg_def_fr <- ggplot(fr_def, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = fr_obs)) +
-  ylim(0, 6) +
+  ylim(0, 4) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
        y = TeX("Fertility rate"), x = "Year") +
@@ -515,7 +515,7 @@ grid.arrange(gg_hmc_N0)
 gg_hmc_mu_lar <- ggplot(data.frame(draw=expgro_hmc_draws$`mu_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lar, sd=psd_mu_lar), colour="black", linewidth=1) +
-  xlim(pm_mu_lar - 6*psd_mu_lar, pm_mu_lar + 6*psd_mu_lar) +
+  xlim(min(pm_mu_lar - 6*psd_mu_lar, min(expgro_hmc_draws$`mu_lar`)), max(pm_mu_lar + 6*psd_mu_lar, max(expgro_hmc_draws$`mu_lar`))) +
   geom_vline(xintercept = mu_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lar}$"),
@@ -525,7 +525,7 @@ gg_hmc_mu_lar <- ggplot(data.frame(draw=expgro_hmc_draws$`mu_lar`)) +
 gg_hmc_sigma_lar <- ggplot(data.frame(draw=expgro_hmc_draws$`sigma_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lar, sd=psd_sigma_lar), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), pm_sigma_lar + 6*psd_sigma_lar) +
+  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), max(pm_sigma_lar + 6*psd_sigma_lar, max(expgro_hmc_draws$`sigma_lar`))) +
   geom_vline(xintercept = sigma_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lar}$"),
@@ -535,7 +535,7 @@ gg_hmc_sigma_lar <- ggplot(data.frame(draw=expgro_hmc_draws$`sigma_lar`)) +
 gg_hmc_mu_lbr <-ggplot(data.frame(draw=expgro_hmc_draws$`mu_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lbr, sd=psd_mu_lbr), colour="black", linewidth=1) +
-  xlim(pm_mu_lbr[1] - 6*psd_mu_lbr, pm_mu_lbr + 6*psd_mu_lbr) +
+  xlim(min(pm_mu_lbr - 6*psd_mu_lbr, min(expgro_hmc_draws$`mu_lbr`)), max(pm_mu_lbr + 6*psd_mu_lbr, max(expgro_hmc_draws$`mu_lbr`))) +
   geom_vline(xintercept = mu_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lbr}$"),
@@ -545,7 +545,7 @@ gg_hmc_mu_lbr <-ggplot(data.frame(draw=expgro_hmc_draws$`mu_lbr`)) +
 gg_hmc_sigma_lbr <- ggplot(data.frame(draw=expgro_hmc_draws$`sigma_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lbr, sd=psd_sigma_lbr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), pm_sigma_lbr + 6*psd_sigma_lbr) +
+  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), max(pm_sigma_lbr + 6*psd_sigma_lbr, max(expgro_hmc_draws$`sigma_lbr`))) +
   geom_vline(xintercept = sigma_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lbr}$"),
@@ -555,7 +555,7 @@ gg_hmc_sigma_lbr <- ggplot(data.frame(draw=expgro_hmc_draws$`sigma_lbr`)) +
 gg_hmc_mu_lfr <- ggplot(data.frame(draw=expgro_hmc_draws$`mu_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lfr, sd=psd_mu_lfr), colour="black", linewidth=1) +
-  xlim(pm_mu_lfr - 6*psd_mu_lfr, pm_mu_lfr + 6*psd_mu_lfr) +
+  xlim(min(pm_mu_lfr - 6*psd_mu_lfr, min(expgro_hmc_draws$`mu_lfr`)), max(pm_mu_lfr + 6*psd_mu_lfr, max(expgro_hmc_draws$`mu_lfr`))) +
   geom_vline(xintercept = mu_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lfr}$"),
@@ -565,7 +565,7 @@ gg_hmc_mu_lfr <- ggplot(data.frame(draw=expgro_hmc_draws$`mu_lfr`)) +
 gg_hmc_sigma_lfr <- ggplot(data.frame(draw=expgro_hmc_draws$`sigma_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lfr, sd=psd_sigma_lfr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), pm_sigma_lfr + 6*psd_sigma_lfr) +
+  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), max(pm_sigma_lfr + 6*psd_sigma_lfr, max(expgro_hmc_draws$`sigma_lfr`))) +
   geom_vline(xintercept = sigma_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lfr}$"),
@@ -656,7 +656,7 @@ gg_hmc_fr <- ggplot(fr_hmc, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = fr_obs)) +
-  ylim(0, 6) +
+  ylim(0, 4) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
        y = TeX("Fertility rate"), x = "Year") +
