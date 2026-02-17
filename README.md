@@ -1,6 +1,6 @@
 The primary goal of this project is to illustrate the need of seeding HMC algorithms in Stan when dealing with latent variables.  
 
-Let us assume that a population experience a population growth as follows:
+Let us assume that a population experience an exponential growth with a net rate $f_{t}-m_{t}$ at time $t=1,2,\ldots,T$, that is, $N_{t+1}=e^{f_{t}-m_{t}}N_{t+1}$ where $f_{t}$ and $m_{t}$ are the fertility and mortality rates at time $t$, respectively.
 
 $$\begin{aligned}
 M_{t} &\sim \mathrm{Bin}\left( N_{t}^{pre}, 1-e^{-m_{t}} \right)\\
