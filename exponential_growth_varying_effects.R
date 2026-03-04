@@ -92,24 +92,32 @@ expgro_data <- list(T = Ty,
                     psd_sigma_lfr = psd_sigma_lfr)
 ### Stan without seeds (default)
 ## HMC (Stan) sampling
-expgro_def <-expgro_model$sample(data = expgro_data,
-                                 chains = 4,
-                                 parallel_chains = 4,
-                                 refresh = 100,
-                                 iter_warmup = 1000,
-                                 iter_sampling = 1000,
-                                 save_warmup = TRUE)
+expgro_map_van <- expgro_model$optimize(data = expgro_data,
+                                        jacobian = TRUE,
+                                        iter = 10000)
+expgro_map_van$summary(variables = c("N0", 
+                                     "mu_lar", "sigma_lar", 
+                                     "mu_lbr", "sigma_lbr", 
+                                     "mu_lfr", "sigma_lfr"))
+expgro_van <- expgro_model$sample(data = expgro_data,
+                                  chains = 4,
+                                  parallel_chains = 4,
+                                  refresh = 100,
+                                  iter_warmup = 1000,
+                                  iter_sampling = 1000,
+                                  init = expgro_map_van,
+                                  save_warmup = TRUE)
 # Summaries
-expgro_def$summary(variables = c("N0",
+expgro_van$summary(variables = c("N0",
                                  "mu_lar", "sigma_lar",
                                  "mu_lbr", "sigma_lbr",
                                  "mu_lfr", "sigma_lfr"))
-expgro_def$summary(variables = "lp__")
+expgro_van$summary(variables = "lp__")
 ### Visualizations
 # Data frame with posterior draws when not seeding 
-expgro_def_draws <- expgro_def$draws(format = "df")
+expgro_van_draws <- expgro_van$draws(format = "df")
 ## Initial population size
-gg_def_N0 <- ggplot(data.frame(draw=expgro_def_draws$`N0`)) +
+gg_van_N0 <- ggplot(data.frame(draw=expgro_van_draws$`N0`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dlnorm, args = list(meanlog=pm_LN0, sdlog=psd_LN0), colour="black", linewidth=1) +
   xlim(0, exp(pm_LN0+0.5*(psd_LN0**2)) + 3*sqrt((exp(psd_LN0**2)-1)*exp(2*pm_LN0+(psd_LN0**2)))) +
@@ -118,79 +126,79 @@ gg_def_N0 <- ggplot(data.frame(draw=expgro_def_draws$`N0`)) +
   labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
        y = TeX("Density"), x = TeX("$N^{pre}_{1}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
-grid.arrange(gg_def_N0)
+grid.arrange(gg_van_N0)
 ## Hyperparameters
 # Mean of log accident rates
-gg_def_mu_lar <- ggplot(data.frame(draw=expgro_def_draws$`mu_lar`)) +
+gg_van_mu_lar <- ggplot(data.frame(draw=expgro_van_draws$`mu_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lar, sd=psd_mu_lar), colour="black", linewidth=1) +
-  xlim(min(pm_mu_lar - 6*psd_mu_lar, min(expgro_def_draws$`mu_lar`)), max(pm_mu_lar + 6*psd_mu_lar, max(expgro_def_draws$`mu_lar`))) +
+  xlim(min(pm_mu_lar - 6*psd_mu_lar, min(expgro_van_draws$`mu_lar`)), max(pm_mu_lar + 6*psd_mu_lar, max(expgro_van_draws$`mu_lar`))) +
   geom_vline(xintercept = mu_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lar}$"),
        y = TeX("Density"), x = TeX("$\\mu_{lar}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Standard deviation of log accident rates
-gg_def_sigma_lar <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lar`)) +
+gg_van_sigma_lar <- ggplot(data.frame(draw=expgro_van_draws$`sigma_lar`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lar, sd=psd_sigma_lar), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), max(pm_sigma_lar + 6*psd_sigma_lar, max(expgro_def_draws$`sigma_lar`))) +
+  xlim(max(0, pm_sigma_lar - 6*psd_sigma_lar), max(pm_sigma_lar + 6*psd_sigma_lar, max(expgro_van_draws$`sigma_lar`))) +
   geom_vline(xintercept = sigma_lar_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lar}$"),
        y = TeX("Density"), x = TeX("$\\sigma_{lar}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Mean of log background mortality rates
-gg_def_mu_lbr <-ggplot(data.frame(draw=expgro_def_draws$`mu_lbr`)) +
+gg_van_mu_lbr <-ggplot(data.frame(draw=expgro_van_draws$`mu_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lbr, sd=psd_mu_lbr), colour="black", linewidth=1) +
-  xlim(min(pm_mu_lbr - 6*psd_mu_lbr, min(expgro_def_draws$`mu_lbr`)), max(pm_mu_lbr + 6*psd_mu_lbr, max(expgro_def_draws$`mu_lbr`))) +
+  xlim(min(pm_mu_lbr - 6*psd_mu_lbr, min(expgro_van_draws$`mu_lbr`)), max(pm_mu_lbr + 6*psd_mu_lbr, max(expgro_van_draws$`mu_lbr`))) +
   geom_vline(xintercept = mu_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lbr}$"),
        y = TeX("Density"), x = TeX("$\\mu_{lbr}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Standard deviation of log background mortality rates
-gg_def_sigma_lbr <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lbr`)) +
+gg_van_sigma_lbr <- ggplot(data.frame(draw=expgro_van_draws$`sigma_lbr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lbr, sd=psd_sigma_lbr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), max(pm_sigma_lbr + 6*psd_sigma_lbr, max(expgro_def_draws$`sigma_lbr`))) +
+  xlim(max(0, pm_sigma_lbr - 6*psd_sigma_lbr), max(pm_sigma_lbr + 6*psd_sigma_lbr, max(expgro_van_draws$`sigma_lbr`))) +
   geom_vline(xintercept = sigma_lbr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lbr}$"),
        y = TeX("Density"), x = TeX("$\\sigma_{lbr}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Mean of log fertility rates
-gg_def_mu_lfr <- ggplot(data.frame(draw=expgro_def_draws$`mu_lfr`)) +
+gg_van_mu_lfr <- ggplot(data.frame(draw=expgro_van_draws$`mu_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dnorm, args = list(mean=pm_mu_lfr, sd=psd_mu_lfr), colour="black", linewidth=1) +
-  xlim(min(pm_mu_lfr - 6*psd_mu_lfr, min(expgro_def_draws$`mu_lfr`)), max(pm_mu_lfr + 6*psd_mu_lfr, max(expgro_def_draws$`mu_lfr`))) +
+  xlim(min(pm_mu_lfr - 6*psd_mu_lfr, min(expgro_van_draws$`mu_lfr`)), max(pm_mu_lfr + 6*psd_mu_lfr, max(expgro_van_draws$`mu_lfr`))) +
   geom_vline(xintercept = mu_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\mu_{lfr}$"),
        y = TeX("Density"), x = TeX("$\\mu_{lfr}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Standard deviation of log fertility rates
-gg_def_sigma_lfr <- ggplot(data.frame(draw=expgro_def_draws$`sigma_lfr`)) +
+gg_van_sigma_lfr <- ggplot(data.frame(draw=expgro_van_draws$`sigma_lfr`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dtnorm, args = list(mean=pm_sigma_lfr, sd=psd_sigma_lfr), colour="black", linewidth=1) +
-  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), max(pm_sigma_lfr + 6*psd_sigma_lfr, max(expgro_def_draws$`sigma_lfr`))) +
+  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), max(pm_sigma_lfr + 6*psd_sigma_lfr, max(expgro_van_draws$`sigma_lfr`))) +
   geom_vline(xintercept = sigma_lfr_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $\\sigma_{lfr}$"),
        y = TeX("Density"), x = TeX("$\\sigma_{lfr}$")) +
   theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
 # Plots
-grid.arrange(gg_def_mu_lfr, gg_def_sigma_lfr,
-             gg_def_mu_lbr, gg_def_sigma_lbr,
-             gg_def_mu_lar, gg_def_sigma_lar,
+grid.arrange(gg_van_mu_lfr, gg_van_sigma_lfr,
+             gg_van_mu_lbr, gg_van_sigma_lbr,
+             gg_van_mu_lar, gg_van_sigma_lar,
              nrow = 3, ncol = 2,
              layout_matrix = rbind(c(1,2), 
                                    c(3,4),
                                    c(5,6)))
 ### Abundance
 # Figures
-pre_abundancy_def <- expgro_def_draws |>
+pre_abundancy_van <- expgro_van_draws |>
   select(starts_with("Npre")) |>
   pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
   mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
@@ -203,7 +211,7 @@ pre_abundancy_def <- expgro_def_draws |>
     .groups = "drop") |>
   arrange(index) |>
   select(-index)
-post_abundancy_def <- expgro_def_draws |>
+post_abundancy_van <- expgro_van_draws |>
   select(starts_with("Npost")) |>
   pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
   mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
@@ -217,12 +225,12 @@ post_abundancy_def <- expgro_def_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_def_Npre <- ggplot(pre_abundancy_def, aes(x = 1:Ty, y = mean)) +
+gg_van_Npre <- ggplot(pre_abundancy_van, aes(x = 1:Ty, y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npre_obs)) +
-  ylim(0, max(pre_abundancy_def$q97.5)) +
+  ylim(0, max(pre_abundancy_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the pre-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -230,12 +238,12 @@ gg_def_Npre <- ggplot(pre_abundancy_def, aes(x = 1:Ty, y = mean)) +
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
   )
-gg_def_Npost <- ggplot(post_abundancy_def, aes(x = 1:Ty, y = mean)) +
+gg_van_Npost <- ggplot(post_abundancy_van, aes(x = 1:Ty, y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npost_obs)) +
-  ylim(0, max(pre_abundancy_def$q97.5)) +
+  ylim(0, max(pre_abundancy_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the post-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -243,10 +251,10 @@ gg_def_Npost <- ggplot(post_abundancy_def, aes(x = 1:Ty, y = mean)) +
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
   )
-grid.arrange(gg_def_Npre, gg_def_Npost, nrow = 1, ncol = 2)
+grid.arrange(gg_van_Npre, gg_van_Npost, nrow = 1, ncol = 2)
 ### Fertility rates
 # Figures
-fr_def <- expgro_def_draws |>
+fr_van <- expgro_van_draws |>
   select(starts_with("fr")) |>
   pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
   mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
@@ -260,7 +268,7 @@ fr_def <- expgro_def_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_def_fr <- ggplot(fr_def, aes(x = 1:Ty, y = mean)) +
+gg_van_fr <- ggplot(fr_van, aes(x = 1:Ty, y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
@@ -273,9 +281,9 @@ gg_def_fr <- ggplot(fr_def, aes(x = 1:Ty, y = mean)) +
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
   )
-grid.arrange(gg_def_fr, nrow = 1, ncol = 1)
+grid.arrange(gg_van_fr, nrow = 1, ncol = 1)
 ## Bckground mortality rates
-br_def <- expgro_def_draws |>
+br_van <- expgro_van_draws |>
   select(starts_with("br")) |>
   pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
   mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
@@ -289,7 +297,7 @@ br_def <- expgro_def_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_def_br <- ggplot(br_def, aes(x = 1:Ty, y = mean)) +
+gg_van_br <- ggplot(br_van, aes(x = 1:Ty, y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
@@ -302,9 +310,9 @@ gg_def_br <- ggplot(br_def, aes(x = 1:Ty, y = mean)) +
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
   )
-grid.arrange(gg_def_br, nrow = 1, ncol = 1)
+grid.arrange(gg_van_br, nrow = 1, ncol = 1)
 ## Accident rates
-ar_def <- expgro_def_draws |>
+ar_van <- expgro_van_draws |>
   select(starts_with("ar")) |>
   pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
   mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
@@ -318,7 +326,7 @@ ar_def <- expgro_def_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_def_ar <- ggplot(ar_def, aes(x = 1:Ty, y = mean)) +
+gg_van_ar <- ggplot(ar_van, aes(x = 1:Ty, y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
@@ -331,7 +339,7 @@ gg_def_ar <- ggplot(ar_def, aes(x = 1:Ty, y = mean)) +
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
   )
-grid.arrange(gg_def_ar, nrow = 1, ncol = 1)
+grid.arrange(gg_van_ar, nrow = 1, ncol = 1)
 
 
 ### Seeding Stan
