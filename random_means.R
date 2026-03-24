@@ -18,7 +18,7 @@ y_obs = array(dim = N)
 pm_mu = 5 
 psd_mu = 0.1
 pm_sigma = 0
-psd_sigma = 0.05
+psd_sigma = 0.1
 sd_y = 0.01
 ### Realisation
 # Draw from the (hyper)priors
@@ -37,7 +37,8 @@ randommeans_data <- list(
   pm_mu = pm_mu,
   psd_mu = psd_mu,
   pm_sigma = pm_sigma,
-  psd_sigma = psd_sigma
+  psd_sigma = psd_sigma,
+  sd_y = sd_y
 )
 ### Stan benchmark sampling 
 randommeans_map <- randommeans_model$optimize(data = randommeans_data,
@@ -106,3 +107,4 @@ mcmc_hist(randommeans_fit$draws("x[19]")) +
   geom_vline(xintercept = x_obs[19])
 mcmc_hist(randommeans_fit$draws("x[20]")) +
   geom_vline(xintercept = x_obs[20])
+
