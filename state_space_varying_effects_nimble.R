@@ -16,9 +16,9 @@ Ty <- 20
 # Objects for storing the simulated observations
 N0_obs=array(dim=1)
 mu_lmr_obs=sigma_lmr_obs=array(dim=1)
-lmr_raw_obs=mr_obs=array(dim=Ty)
+lmr_raw_obs=lmr_obs=mr_obs=array(dim=Ty)
 mu_lfr_obs=sigma_lfr_obs=array(dim=1)
-lfr_raw_obs=fr_obs=array(dim=Ty)
+lfr_raw_obs=lfr_obs=fr_obs=array(dim=Ty)
 M_obs=array(dim=Ty)
 Npre_obs=array(dim=Ty) 
 Npost_obs=array(dim=Ty)
@@ -34,16 +34,19 @@ psd_mu_lfr = 0.1
 pm_sigma_lfr = 0
 psd_sigma_lfr = 0.05
 ### Realisation
-# Draw from the (hyper)priors such that A > 0
+# Draw from the (hyper)priors such that M > 0
 with_seed(87L,{
-  #N0_obs <- floor(rlnorm(n = 1, pm_LN0, psd_LN0))
   N0_obs <- rpois(n = 1, exp(pm_LN0))
   lmr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lmr_obs <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
   sigma_lmr_obs <- rtnorm(n = 1, pm_sigma_lmr, psd_sigma_lmr, a=0)
+  lmr_obs = mu_lmr_obs + sigma_lmr_obs*lmr_raw_obs
+  mr_obs = exp(lmr_obs)
   lfr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lfr_obs <- rnorm(n = 1, pm_mu_lfr, psd_mu_lfr)
   sigma_lfr_obs <- rtnorm(n = 1, pm_sigma_lfr, psd_sigma_lfr, a=0)
+  lfr_obs = mu_lfr_obs + sigma_lfr_obs*lfr_raw_obs
+  fr_obs = exp(lfr_obs)
   for(t in 1:Ty){
     if(t==1){
       Npre_obs[t] = N0_obs
@@ -51,8 +54,6 @@ with_seed(87L,{
     else{
       Npre_obs[t] <- rpois(n = 1, fr_obs[t-1]*Npost_obs[t-1]) 
     }
-    mr_obs[t] = exp(mu_lmr_obs + sigma_lmr_obs*lmr_raw_obs[t])
-    fr_obs[t] = exp(mu_lfr_obs + sigma_lfr_obs*lfr_raw_obs[t])
     M_obs[t] <- rbinom(n = 1, size = Npre_obs[t], prob = 1-exp(-mr_obs[t]))
     Npost_obs[t] = Npre_obs[t] - M_obs[t] 
   }
@@ -100,17 +101,12 @@ ss_constants <- list(T = Ty,
 ### NIMBLE data
 ss_data <- list(M = M_obs)
 ### NIMBLE without seeds (default)
-ss_inits_van <- list(N0 = floor(exp(pm_LN0)),
-                     mu_lmr = pm_mu_lmr,
-                     sigma_lmr = pm_sigma_lmr,
-                     mu_lfr = pm_mu_lfr,
-                     sigma_lfr = pm_sigma_lfr)
+ss_inits_van <- list()
 # NIMBLE Model
 ss_model_van <- nimbleModel(code = ss_code,
                             constants = ss_constants,
                             data = ss_data,
                             inits = ss_inits_van)
-ss_model_van$getNodeNames()
 ss_cmodel_van <- compileNimble(ss_model_van)
 ss_mcmc_van <- configureMCMC(ss_model_van, print = TRUE)
 ss_mcmc_van$addMonitors(c("mu_lmr", "sigma_lmr", "mr",
@@ -119,7 +115,8 @@ ss_mcmc_van$addMonitors(c("mu_lmr", "sigma_lmr", "mr",
 ss_modelMCMC_van <- buildMCMC(ss_mcmc_van)
 ss_cmodelMCMC_van <- compileNimble(ss_modelMCMC_van, project = ss_model_van)
 ss_samples_van <- runMCMC(ss_cmodelMCMC_van,
-                          niter = 1000,
+                          niter = 10000,
+                          nburnin = 5000,
                           nchains = 4)
 # Summaries
 ### Visualizations
@@ -291,8 +288,8 @@ gg_van_mr <- ggplot(mr_van, aes(x = 1:Ty, y = mean)) +
   geom_point(aes(x = 1:Ty, y = mr_obs)) +
   ylim(0, 1) +
   theme_minimal() +
-  labs(title = TeX("Background mortality rates"),
-       y = TeX("Background mortality rate"), x = "Year") +
+  labs(title = TeX("Mortality rates"),
+       y = TeX("Mortality rate"), x = "Year") +
   theme(
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
@@ -377,62 +374,6 @@ ginit <- function(D, cutoff){
     )
   )
 }
-robust_optimize <- function(stan_model, data, D, cutoff) {
-  attempt <- 1
-  success <- FALSE
-  result <- NULL
-  while(!success) {
-    message("Attempt ", attempt)
-    result <- tryCatch(
-      expr = {
-        out <- capture.output(
-          map <- stan_model$optimize(data = data,
-                                     init = list(ginit(D, cutoff)),
-                                     jacobian = TRUE,
-                                     iter = 10000
-          ),
-          type = "message"
-        )
-        if (length(out) > 0) message(out[1])
-        map
-      },
-      error = function(e) {
-        message("Error on attempt ", attempt, ": ", e$message)
-        return(NULL)
-      }, 
-      warning = function(w) {
-        message("Warning on attempt ", attempt, ": ", w$message)
-        return(NULL)
-      }
-    )
-    if (!is.null(result)) {
-      success <- TRUE
-      message("Optimization succeeded on attempt ", attempt)
-    } 
-    else {
-      attempt <- attempt + 1
-    }
-  }
-  return(result)
-}
-## Deploying approximations to get better initial values
-# Maximum a posteriori
-ss_map_seeded <- robust_optimize(ss_model,
-                                 ss_data, 
-                                 D=1, cutoff=1000)
-ss_map_seeded$summary(variables = c("N0", 
-                                    "mu_lmr", "sigma_lmr", 
-                                    "mu_lfr", "sigma_lfr"))
-## HMC (Stan) sampling
-ss_seeded <- ss_model$sample(data = ss_data,
-                             chains = 4,
-                             parallel_chains = 4,
-                             refresh = 100,
-                             iter_warmup = 1000,
-                             iter_sampling = 1000,
-                             init = ss_map_seeded,
-                             save_warmup = TRUE)
-
 ss_inits_seeded <- list(ginit(D=1, cutoff=1000))
 # NIMBLE Model
 ss_model_seeded <- nimbleModel(code = ss_code,
@@ -447,7 +388,8 @@ ss_mcmc_seeded$addMonitors(c("mu_lmr", "sigma_lmr", "mr",
 ss_modelMCMC_seeded <- buildMCMC(ss_mcmc_seeded)
 ss_cmodelMCMC_seeded <- compileNimble(ss_modelMCMC_seeded, project = ss_model_seeded)
 ss_samples_seeded <- runMCMC(ss_cmodelMCMC_seeded,
-                             niter = 1000,
+                             niter = 10000,
+                             nburnin = 5000,
                              nchains = 4)
 # Summaries
 
@@ -620,8 +562,8 @@ gg_seeded_mr <- ggplot(mr_seeded, aes(x = 1:Ty, y = mean)) +
   geom_point(aes(x = 1:Ty, y = mr_obs)) +
   ylim(0, 1) +
   theme_minimal() +
-  labs(title = TeX("Background mortality rates"),
-       y = TeX("Background mortality rate"), x = "Year") +
+  labs(title = TeX("Mortality rates"),
+       y = TeX("Mortality rate"), x = "Year") +
   theme(
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.caption = element_text(size = 12, hjust = 1)
