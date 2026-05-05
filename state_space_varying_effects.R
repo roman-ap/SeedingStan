@@ -16,16 +16,16 @@ Ty <- 20
 # Objects for storing the simulated observations
 N0_obs=array(dim=1)
 mu_lmr_obs=sigma_lmr_obs=array(dim=1)
-lmr_raw_obs=mr_obs=array(dim=Ty)
+lmr_raw_obs=lmr_obs=mr_obs=array(dim=Ty)
 mu_lfr_obs=sigma_lfr_obs=array(dim=1)
-lfr_raw_obs=fr_obs=array(dim=Ty)
+lfr_raw_obs=lfr_obs=fr_obs=array(dim=Ty)
 M_obs=array(dim=Ty)
 Npre_obs=array(dim=Ty) 
 Npost_obs=array(dim=Ty)
 ### (Hyper)priors
-# Propose your (hyper)priors 
-pm_LN0 = 6
-psd_LN0 = 0.5
+pm_N0 = exp(6)
+pm_LN0 = 1.5*log(pm_N0) - 0.5*log1p(pm_N0)
+psd_LN0 = sqrt(log1p(pm_N0)-log(pm_N0))
 pm_mu_lmr = -1
 psd_mu_lmr = 0.1
 pm_sigma_lmr = 0
@@ -37,13 +37,17 @@ psd_sigma_lfr = 0.05
 ### Realisation
 # Draw from the (hyper)priors such that A > 0
 with_seed(87L,{
-  N0_obs <- floor(rlnorm(n = 1, pm_LN0, psd_LN0))
+  N0_obs <- rpois(n = 1, pm_N0)
   lmr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lmr_obs <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
   sigma_lmr_obs <- rtnorm(n = 1, pm_sigma_lmr, psd_sigma_lmr, a=0)
+  lmr_obs = mu_lmr_obs + sigma_lmr_obs*lmr_raw_obs
+  mr_obs = exp(lmr_obs)
   lfr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lfr_obs <- rnorm(n = 1, pm_mu_lfr, psd_mu_lfr)
   sigma_lfr_obs <- rtnorm(n = 1, pm_sigma_lfr, psd_sigma_lfr, a=0)
+  lfr_obs = mu_lfr_obs + sigma_lfr_obs*lfr_raw_obs
+  fr_obs = exp(lfr_obs)
   for(t in 1:Ty){
     if(t==1){
       Npre_obs[t]=N0_obs
@@ -51,8 +55,6 @@ with_seed(87L,{
     else{
       Npre_obs[t]=rpois(n = 1, fr_obs[t-1]*Npost_obs[t-1]) 
     }
-    mr_obs[t] = exp(mu_lmr_obs + sigma_lmr_obs*lmr_raw_obs[t])
-    fr_obs[t] = exp(mu_lfr_obs + sigma_lfr_obs*lfr_raw_obs[t])
     M_obs[t] = rbinom(n = 1, size = Npre_obs[t], prob = 1-exp(-mr_obs[t]))
     Npost_obs[t] = Npre_obs[t] - M_obs[t] 
   }
@@ -277,13 +279,10 @@ grid.arrange(gg_van_mr, nrow = 1, ncol = 1)
 ginit <- function(D, cutoff){
   # Objects for storing the prior predictive draws
   N0_prip=array(dim=D)
-  #mu_lar_prip=sigma_lar_prip=array(dim=D)
-  #lar_raw_prip=ar_prip=array(dim=c(D,Ty))
   mu_lmr_prip=sigma_lmr_prip=array(dim=D)
   lmr_raw_prip=mr_prip=array(dim=c(D,Ty))
   mu_lfr_prip=sigma_lfr_prip=array(dim=D)
   lfr_raw_prip=fr_prip=array(dim=c(D,Ty))
-  #A_prip=array(dim=c(D,Ty))
   M_prip=array(dim=c(D,Ty))
   Npre_prip=array(dim=c(D,Ty)) 
   Npost_prip=array(dim=c(D,Ty))
@@ -291,16 +290,15 @@ ginit <- function(D, cutoff){
   d = 1
   # Realisations
   while (d <= D) {
-    N0_prip[d] <- floor(rlnorm(n = 1, pm_LN0, psd_LN0))
-    #mu_lar_prip[d] <- rnorm(n = 1, pm_mu_lar, psd_mu_lar)
-    #sigma_lar_prip[d] <- rtnorm(n= 1, pm_sigma_lar, psd_sigma_lar, a=0)
-    #lar_raw_prip[d,] <- rnorm(n = Ty, 0, 1)
+    N0_prip[d] <- rpois(n = 1, pm_N0)
     mu_lmr_prip[d] <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
     sigma_lmr_prip[d] <- rtnorm(n = 1, pm_sigma_lmr, psd_sigma_lmr, a=0)
     lmr_raw_prip[d,] <- rnorm(n = Ty, 0, 1)
+    mr_prip[d,] = exp(mu_lmr_prip[d] + sigma_lmr_prip[d]*lmr_raw_prip[d,])
     mu_lfr_prip[d] <- rnorm(n = 1, pm_mu_lfr, psd_mu_lfr)
     sigma_lfr_prip[d] <- rtnorm(n = 1, pm_sigma_lfr, psd_sigma_lfr, a=0)
     lfr_raw_prip[d,] <- rnorm(n = Ty, 0, 1)
+    fr_prip[d,] = exp(mu_lfr_prip[d] + sigma_lfr_prip[d]*lfr_raw_prip[d,])
     for(t in 1:Ty){
       if(t==1){
         Npre_prip[d,t] = N0_prip[d]
@@ -308,13 +306,7 @@ ginit <- function(D, cutoff){
       else{
         Npre_prip[d,t] <- rpois(n = 1, fr_prip[d,t-1]*Npost_prip[d,t-1]) 
       }
-      #ar_prip[d,t] = exp(mu_lar_prip[d] + sigma_lar_prip[d]*lar_raw_prip[d,t])
-      #br_prip[d,t] = exp(mu_lmr_prip[d] + sigma_lmr_prip[d]*lbr_raw_prip[d,t])
-      mr_prip[d,t] = exp(mu_lmr_prip[d] + sigma_lmr_prip[d]*lmr_raw_prip[d,t])
-      fr_prip[d,t] = exp(mu_lfr_prip[d] + sigma_lfr_prip[d]*lfr_raw_prip[d,t])
-      #M_prip[d,t] <- rbinom(n = 1, size = Npre_prip[d,t], prob = 1-exp(-(ar_prip[d,t]+br_prip[d,t])))
       M_prip[d,t] <- rbinom(n = 1, size = Npre_prip[d,t], prob = 1-exp(-mr_prip[d,t]))
-      #A_prip[d,t] <- rbinom(n = 1, size = M_prip[d,t], prob = ar_prip[d,t]/(ar_prip[d,t]+br_prip[d,t]))
       Npost_prip[d,t] = Npre_prip[d,t] - M_prip[d,t]
     }
     if(dist(rbind(as.vector(M_obs), as.vector(M_prip[d,])), method = "maximum")<cutoff){
@@ -325,33 +317,25 @@ ginit <- function(D, cutoff){
   }
   # Objects for storing the mean of prior predictive draws
   N0_pripm=array(dim=1)
-  #mu_lar_pripm=sigma_lar_pripm=array(dim=1)
-  #lar_raw_pripm=ar_pripm=array(dim=Ty)
   mu_lmr_pripm=sigma_lmr_pripm=array(dim=1)
   lmr_raw_pripm=mr_pripm=array(dim=Ty)
   mu_lfr_pripm=sigma_lfr_pripm=array(dim=1)
   lfr_raw_pripm=fr_pripm=array(dim=Ty)
-  #A_pripm=array(dim=Ty)
   M_pripm=array(dim=Ty)
   Npre_pripm=array(dim=Ty) 
   Npost_pripm=array(dim=Ty)
   # Means
   N0_pripm = mean(N0_prip[good_draws])
-  #mu_lar_pripm = mean(mu_lar_prip[good_draws])
-  #sigma_lar_pripm = mean(sigma_lar_prip[good_draws])
   mu_lmr_pripm = mean(mu_lmr_prip[good_draws])
   sigma_lmr_pripm = mean(sigma_lmr_prip[good_draws])
   mu_lfr_pripm = mean(mu_lfr_prip[good_draws])
   sigma_lfr_pripm = mean(sigma_lfr_prip[good_draws])
     for(t in 1:Ty){
-      #lar_raw_pripm[t] = mean(lar_raw_prip[good_draws,t])
-      #ar_pripm[t] = mean(ar_prip[good_draws,t])
       lmr_raw_pripm[t] = mean(lmr_raw_prip[good_draws,t])
       mr_pripm[t] = mean(mr_prip[good_draws,t])
       lfr_raw_pripm[t] = mean(lfr_raw_prip[good_draws,t])
       fr_pripm[t] = mean(fr_prip[good_draws,t])
       M_pripm[t] = mean(M_prip[good_draws,t])
-      #A_pripm[t] = mean(A_prip[good_draws,t])
       Npost_pripm[t] = mean(Npost_prip[good_draws,t])
       Npre_pripm[t] = mean(Npre_prip[good_draws,t])
     }
@@ -359,10 +343,6 @@ ginit <- function(D, cutoff){
     list(
       N0_raw = Npre_pripm[1] - M_pripm[1],
       NB_raw = Npre_pripm[2:Ty] - M_pripm[2:Ty],
-      #U = (M_pripm - A_pripm)/(Npre_pripm - A_pripm),
-      #mu_lar = mu_lar_pripm,
-      #sigma_lar = sigma_lar_pripm,
-      #lar_raw = lar_raw_pripm,
       mu_lmr = mu_lmr_pripm,
       sigma_lmr = sigma_lmr_pripm,
       lmr_raw = lmr_raw_pripm,
@@ -414,7 +394,7 @@ robust_optimize <- function(stan_model, data, D, cutoff) {
 # Maximum a posteriori
 ss_map_seeded <- robust_optimize(ss_model,
                                  ss_data, 
-                                 D=1, cutoff=1000)
+                                 D=1, cutoff=25000)
 ss_map_seeded$summary(variables = c("N0", 
                                     "mu_lmr", "sigma_lmr", 
                                     "mu_lfr", "sigma_lfr"))
@@ -442,7 +422,7 @@ ss_seeded_draws <- ss_seeded$draws(format = "df")
 gg_seeded_N0 <- ggplot(data.frame(draw=ss_seeded_draws$`N0`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dlnorm, args = list(meanlog=pm_LN0, sdlog=psd_LN0), colour="black", linewidth=1) +
-  xlim(0, exp(pm_LN0+0.5*(psd_LN0**2)) + 3*sqrt((exp(psd_LN0**2)-1)*exp(2*pm_LN0+(psd_LN0**2)))) +
+  xlim(0, exp(pm_LN0+0.5*(psd_LN0**2)) + 5*sqrt((exp(psd_LN0**2)-1)*exp(2*pm_LN0+(psd_LN0**2)))) +
   geom_vline(xintercept = N0_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
