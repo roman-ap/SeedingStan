@@ -295,7 +295,210 @@ gg_van_mr <- ggplot(mr_van, aes(x = 1:Ty, y = mean)) +
     plot.caption = element_text(size = 12, hjust = 1)
   )
 grid.arrange(gg_van_mr, nrow = 1, ncol = 1)
-
+### NIMBLE with seeds (true values)
+ss_inits_true <- list(
+  N0 = Npre_obs[1],
+  Npre = Npre_obs,
+  mu_lmr = mu_lmr_obs,
+  sigma_lmr = sigma_lmr_obs,
+  lmr_raw = lmr_raw_obs,
+  mu_lfr = mu_lfr_obs,
+  sigma_lfr = sigma_lfr_obs,
+  lfr_raw = lfr_raw_obs
+)
+# NIMBLE Model
+ss_model_true <- nimbleModel(code = ss_code,
+                             constants = ss_constants,
+                             data = ss_data,
+                             inits = ss_inits_true)
+ss_cmodel_true <- compileNimble(ss_model_true)
+ss_mcmc_true <- configureMCMC(ss_model_true, print = TRUE)
+ss_mcmc_true$addMonitors(c("mu_lmr", "sigma_lmr", "mr",
+                           "mu_lfr", "sigma_lfr", "fr",
+                           "N0", "Npre", "Npost"))
+ss_modelMCMC_true <- buildMCMC(ss_mcmc_true)
+ss_cmodelMCMC_true <- compileNimble(ss_modelMCMC_true, project = ss_model_true)
+ss_samples_true <- runMCMC(ss_cmodelMCMC_true,
+                           niter = 10000,
+                           nburnin = 5000,
+                           nchains = 4)
+# Summaries
+### Visualizations
+# Data frame with posterior draws when not seeding 
+ss_true_draws <- do.call(rbind, lapply(ss_samples_true, as.data.frame))
+## Initial population size
+gg_true_N0 <- ggplot(data.frame(draw=ss_true_draws$`N0`)) +
+  geom_bar(aes(x=draw, y=after_stat(prop)), color="pink", fill="pink") +
+  stat_function(fun = dpois, args = list(lambda=exp(pm_LN0)), geom = "step", colour="black", linewidth=1) +
+  #xlim(0, 1000) +
+  geom_vline(xintercept = N0_obs, color="blue") +
+  theme_minimal() +
+  labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
+       y = TeX("Density"), x = TeX("$N^{pre}_{1}$")) +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
+grid.arrange(gg_true_N0)
+## Hyperparameters
+# Mean of log mortality rates
+gg_true_mu_lmr <-ggplot(data.frame(draw=ss_true_draws$`mu_lmr`)) +
+  geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
+  stat_function(fun = dnorm, args = list(mean=pm_mu_lmr, sd=psd_mu_lmr), colour="black", linewidth=1) +
+  xlim(min(pm_mu_lmr - 6*psd_mu_lmr, min(ss_true_draws$`mu_lmr`)), max(pm_mu_lmr + 6*psd_mu_lmr, max(ss_true_draws$`mu_lmr`))) +
+  geom_vline(xintercept = mu_lmr_obs, color="blue") +
+  theme_minimal() +
+  labs(title = TeX("Prior and posterior distribution of $\\mu_{lmr}$"),
+       y = TeX("Density"), x = TeX("$\\mu_{lmr}$")) +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
+# Standard deviation of log mortality rates
+gg_true_sigma_lmr <- ggplot(data.frame(draw=ss_true_draws$`sigma_lmr`)) +
+  geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
+  stat_function(fun = dtnorm, args = list(mean=pm_sigma_lmr, sd=psd_sigma_lmr), colour="black", linewidth=1) +
+  xlim(max(0, pm_sigma_lmr - 6*psd_sigma_lmr), max(pm_sigma_lmr + 6*psd_sigma_lmr, max(ss_true_draws$`sigma_lmr`))) +
+  geom_vline(xintercept = sigma_lmr_obs, color="blue") +
+  theme_minimal() +
+  labs(title = TeX("Prior and posterior distribution of $\\sigma_{lbr}$"),
+       y = TeX("Density"), x = TeX("$\\sigma_{lbr}$")) +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
+# Mean of log fertility rates
+gg_true_mu_lfr <- ggplot(data.frame(draw=ss_true_draws$`mu_lfr`)) +
+  geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
+  stat_function(fun = dnorm, args = list(mean=pm_mu_lfr, sd=psd_mu_lfr), colour="black", linewidth=1) +
+  xlim(min(pm_mu_lfr - 6*psd_mu_lfr, min(ss_true_draws$`mu_lfr`)), max(pm_mu_lfr + 6*psd_mu_lfr, max(ss_true_draws$`mu_lfr`))) +
+  geom_vline(xintercept = mu_lfr_obs, color="blue") +
+  theme_minimal() +
+  labs(title = TeX("Prior and posterior distribution of $\\mu_{lfr}$"),
+       y = TeX("Density"), x = TeX("$\\mu_{lfr}$")) +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
+# Standard deviation of log fertility rates
+gg_true_sigma_lfr <- ggplot(data.frame(draw=ss_true_draws$`sigma_lfr`)) +
+  geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
+  stat_function(fun = dtnorm, args = list(mean=pm_sigma_lfr, sd=psd_sigma_lfr), colour="black", linewidth=1) +
+  xlim(max(0, pm_sigma_lfr - 6*psd_sigma_lfr), max(pm_sigma_lfr + 6*psd_sigma_lfr, max(ss_true_draws$`sigma_lfr`))) +
+  geom_vline(xintercept = sigma_lfr_obs, color="blue") +
+  theme_minimal() +
+  labs(title = TeX("Prior and posterior distribution of $\\sigma_{lfr}$"),
+       y = TeX("Density"), x = TeX("$\\sigma_{lfr}$")) +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5))
+# Plots
+grid.arrange(gg_true_mu_lfr, gg_true_sigma_lfr,
+             gg_true_mu_lmr, gg_true_sigma_lmr,
+             nrow = 2, ncol = 2,
+             layout_matrix = rbind(c(1,2), 
+                                   c(3,4)))
+### Abundance
+# Figures
+pre_abundancy_true <- ss_true_draws |>
+  select(starts_with("Npre")) |>
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
+  mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
+  group_by(parameter, index) |>
+  summarise(
+    mean = mean(value),
+    sd = sd(value),
+    q2.5 = quantile(value, 0.025),
+    q97.5 = quantile(value, 0.975),
+    .groups = "drop") |>
+  arrange(index) |>
+  select(-index)
+post_abundancy_true <- ss_true_draws |>
+  select(starts_with("Npost")) |>
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
+  mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
+  group_by(parameter, index) |>
+  summarise(
+    mean = mean(value),
+    sd = sd(value),
+    q2.5 = quantile(value, 0.025),
+    q97.5 = quantile(value, 0.975),
+    .groups = "drop") |>
+  arrange(index) |>
+  select(-index)
+# Plots
+gg_true_Npre <- ggplot(pre_abundancy_true, aes(x = 1:Ty, y = mean)) +
+  geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
+              fill = "pink", alpha = 0.5) +
+  geom_line(color = "magenta", linewidth = 1) +
+  geom_point(aes(x = 1:Ty, y = Npre_obs)) +
+  ylim(0, max(pre_abundancy_true$q97.5)) +
+  theme_minimal() +
+  labs(title = TeX("Posterior of the pre-mortality population"),
+       y = TeX("Total population"), x = "Year") +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12, hjust = 1)
+  )
+gg_true_Npost <- ggplot(post_abundancy_true, aes(x = 1:Ty, y = mean)) +
+  geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
+              fill = "pink", alpha = 0.5) +
+  geom_line(color = "magenta", linewidth = 1) +
+  geom_point(aes(x = 1:Ty, y = Npost_obs)) +
+  ylim(0, max(pre_abundancy_true$q97.5)) +
+  theme_minimal() +
+  labs(title = TeX("Posterior of the post-mortality population"),
+       y = TeX("Total population"), x = "Year") +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12, hjust = 1)
+  )
+grid.arrange(gg_true_Npre, gg_true_Npost, nrow = 1, ncol = 2)
+### Fertility rates
+# Figures
+fr_true <- ss_true_draws |>
+  select(starts_with("fr")) |>
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
+  mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
+  group_by(parameter, index) |>
+  summarise(
+    mean = mean(value),
+    sd = sd(value),
+    q2.5 = quantile(value, 0.025),
+    q97.5 = quantile(value, 0.975),
+    .groups = "drop") |>
+  arrange(index) |>
+  select(-index)
+# Plots
+gg_true_fr <- ggplot(fr_true, aes(x = 1:Ty, y = mean)) +
+  geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
+              fill = "pink", alpha = 0.5) +
+  geom_line(color = "magenta", linewidth = 1) +
+  geom_point(aes(x = 1:Ty, y = fr_obs)) +
+  ylim(0, 4) +
+  theme_minimal() +
+  labs(title = TeX("Fertility rates"),
+       y = TeX("Fertility rate"), x = "Year") +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12, hjust = 1)
+  )
+grid.arrange(gg_true_fr, nrow = 1, ncol = 1)
+## Mortality rates
+mr_true <- ss_true_draws |>
+  select(starts_with("mr")) |>
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") |>
+  mutate(index = as.numeric(str_extract(parameter, "(?<=\\[)\\d+(?=\\])"))) |>
+  group_by(parameter, index) |>
+  summarise(
+    mean = mean(value),
+    sd = sd(value),
+    q2.5 = quantile(value, 0.025),
+    q97.5 = quantile(value, 0.975),
+    .groups = "drop") |>
+  arrange(index) |>
+  select(-index)
+# Plots
+gg_true_mr <- ggplot(mr_true, aes(x = 1:Ty, y = mean)) +
+  geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
+              fill = "pink", alpha = 0.5) +
+  geom_line(color = "magenta", linewidth = 1) +
+  geom_point(aes(x = 1:Ty, y = mr_obs)) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(title = TeX("Mortality rates"),
+       y = TeX("Mortality rate"), x = "Year") +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12, hjust = 1)
+  )
+grid.arrange(gg_true_mr, nrow = 1, ncol = 1)
 ### Seeding Stan
 ## Functions for generating initial seeds 
 ginit <- function(D, cutoff){
@@ -374,7 +577,7 @@ ginit <- function(D, cutoff){
     )
   )
 }
-ss_inits_seeded <- list(ginit(D=1, cutoff=1000))
+ss_inits_seeded <- list(ginit(D=1, cutoff=750))
 # NIMBLE Model
 ss_model_seeded <- nimbleModel(code = ss_code,
                                constants = ss_constants,
