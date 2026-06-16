@@ -13,7 +13,7 @@ From a Bayesian perspective
 
 $$\begin{aligned}
 N^{pre}_{1} &\sim \mathrm{Poi}\left( e^{LN0} \right)\\
-\log(m_{t}) &\sim \mathrm{N}\left( \mu_{lb}, \sigma_{lb} \right)\\
+\log(m_{t}) &\sim \mathrm{N}\left( \mu_{lm}, \sigma_{lm} \right)\\
 \log(f_{t}) &\sim \mathrm{N}\left( \mu_{lf}, \sigma_{lf} \right)
 \end{aligned}$$
 
