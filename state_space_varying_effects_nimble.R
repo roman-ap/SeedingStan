@@ -12,7 +12,7 @@ library(latex2exp)
 
 ##### Data simulation
 # Dimension
-Ty <- 20
+Ty <- 10
 # Objects for storing the simulated observations
 N0_obs=array(dim=1)
 mu_lmr_obs=sigma_lmr_obs=array(dim=1)
@@ -35,7 +35,7 @@ pm_sigma_lfr = 0
 psd_sigma_lfr = 0.05
 ### Realisation
 # Draw from the (hyper)priors such that M > 0
-with_seed(87L,{
+with_seed(1987L,{
   N0_obs <- rpois(n = 1, exp(pm_LN0))
   lmr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lmr_obs <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
@@ -126,7 +126,7 @@ ss_van_draws <- do.call(rbind, lapply(ss_samples_van, as.data.frame))
 gg_van_N0 <- ggplot(data.frame(draw=ss_van_draws$`N0`)) +
   geom_bar(aes(x=draw, y=after_stat(prop)), color="pink", fill="pink") +
   stat_function(fun = dpois, args = list(lambda=exp(pm_LN0)), geom = "step", colour="black", linewidth=1) +
-  #xlim(0, 1000) +
+  xlim(0, 1000) +
   geom_vline(xintercept = N0_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
@@ -330,7 +330,7 @@ ss_true_draws <- do.call(rbind, lapply(ss_samples_true, as.data.frame))
 gg_true_N0 <- ggplot(data.frame(draw=ss_true_draws$`N0`)) +
   geom_bar(aes(x=draw, y=after_stat(prop)), color="pink", fill="pink") +
   stat_function(fun = dpois, args = list(lambda=exp(pm_LN0)), geom = "step", colour="black", linewidth=1) +
-  #xlim(0, 1000) +
+  xlim(0, 1000) +
   geom_vline(xintercept = N0_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
@@ -577,7 +577,7 @@ ginit <- function(D, cutoff){
     )
   )
 }
-ss_inits_seeded <- list(ginit(D=1, cutoff=750))
+ss_inits_seeded <- list(ginit(D=1, cutoff=1000))
 # NIMBLE Model
 ss_model_seeded <- nimbleModel(code = ss_code,
                                constants = ss_constants,

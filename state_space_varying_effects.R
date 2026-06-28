@@ -12,7 +12,7 @@ library(latex2exp)
 
 ##### Data simulation
 # Dimension
-Ty <- 20
+Ty <- 10
 # Objects for storing the simulated observations
 N0_obs=array(dim=1)
 mu_lmr_obs=sigma_lmr_obs=array(dim=1)
