@@ -5,6 +5,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \usepackage{amsthm}
 \usepackage{url}
@@ -29,7 +31,7 @@ The primary goal of this work is to illustrate the need of seeding MCMC/HMC algo
 \end{abstract}
 
 \section{Introduction}
-In real-world scenarios, researchers and practitioners often aim to infer 
+In real-world scenarios, researchers and practitioners often aim to explain the causes of a specific  
 
 \section{Literature Review}
 
@@ -37,6 +39,30 @@ In real-world scenarios, researchers and practitioners often aim to infer
 
 \section{Methodology}
 
+In Statistics, without loss of generalization, we usually propose a stochastic mechanism to approximate the underlying law that is governing a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes of interest and $\boldsymbol{\theta}$ is a random vector that fully defines such a stochastic mechanism.\\
+
+Sometimes we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$.\\      
+
+We can simulate $\mathbf{x}$ using Algorithm~\ref{alg:inits}.
+
+\begin{algorithm}
+\caption{Algorithm Name}
+\label{alg:inits}
+\begin{algorithmic}[1]
+
+\Require $\boldsymbol{\theta}^{(t)}$
+\Ensure $\boldsymbol{\theta}^{(t)}, \mathbf{x}^{(t)}, \mathbf{y}^{(t)}$
+
+\State $t = 0$
+
+\Repeat
+	\State $t \leftarrow t+1$
+	\State $\boldsymbol{\theta}^{(t)} \sim \pi(\boldsymbol{\theta})$
+    \State $\mathbf{x}^{(t)}, \mathbf{y}^{(t)} \sim \pi(\mathbf{x}, \mathbf{y} \vert \boldsymbol{\theta})$
+\Until{$d(\mathbf{y}^{(t)}, \mathbf{y}^{obs}) < d^{max}$}
+
+\end{algorithmic}
+\end{algorithm}
 
 \section{Simulations}
 
@@ -49,7 +75,7 @@ M_{t} &\sim \mathrm{Bin}\left( N_{t}^{pre}, 1-e^{-m_{t}} \right)\\
 N_{t+1}^{pre} &\sim \mathrm{Poi}\left( e^{f_{t}}N_{t}^{post} \right)
 \end{align*}
 
-From a Bayesian perspective
+Furthermore,
 
 \begin{align*}
 \log(N^{pre}_{1}) &\sim \mathrm{Poi}\left( e^{LN_{0}} \right)\\
