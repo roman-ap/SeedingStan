@@ -13,7 +13,7 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=red,citecolor=blue,filecolor=magenta,urlcolor=green}
 
-\title{Seeding MCMC/HMC algorithms}
+\title{Seeding Monte Carlo algorithms}
 \author{
   Guti\'errez-Pe\~na, Eduardo\\
   \texttt{eduardo@sigma.iimas.unam.mx}
@@ -27,11 +27,11 @@
 \maketitle
 
 \begin{abstract}
-The primary goal of this work is to illustrate the need of seeding MCMC/HMC algorithms when dealing with unobserved/latent variables.  
+The primary goal of this work is to illustrate the need of seeding Monte Carlo algorithms when dealing with unobserved variables.  
 \end{abstract}
 
 \section{Introduction}
-In real-world scenarios, researchers and practitioners often aim to explain the causes of a specific  
+In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a statistical perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing such a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism. Within the Bayesian approach, we further elicitate a propobalistic distribution for $\boldsymbol{\theta}$, say $\pi(\boldsymbol{\theta})$.\\
 
 \section{Literature Review}
 
@@ -39,14 +39,13 @@ In real-world scenarios, researchers and practitioners often aim to explain the 
 
 \section{Methodology}
 
-In Statistics, without loss of generalization, we usually propose a stochastic mechanism to approximate the underlying law that is governing a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes of interest and $\boldsymbol{\theta}$ is a random vector that fully defines such a stochastic mechanism.\\
+Monte Carlo methods, such as MCMC and HMC, are widely used in practice for reconstructing the posterior distribution $\pi(\boldsymbol{\theta} \vert \mathbf{z})$. (Here we explain how they are implemented). A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Leveraring a distance-based approach in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
 
-Sometimes we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$.\\      
 
-We can simulate $\mathbf{x}$ using Algorithm~\ref{alg:inits}.
+Algorithm~\ref{alg:inits} summaries such a seeding process.
 
 \begin{algorithm}
-\caption{Algorithm Name}
+\caption{Distance-based Seeding}
 \label{alg:inits}
 \begin{algorithmic}[1]
 
