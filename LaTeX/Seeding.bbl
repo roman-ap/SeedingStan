@@ -1,9 +1,81 @@
 \begin{thebibliography}{}
 
+\bibitem[Auger-Méthé et~al., 2021]{AugerMethe2021}
+Auger-Méthé, M., Newman, K., Cole, D., Empacher, F., Gryba, R., King, A.~A.,
+  Leos-Barajas, V., Mills~Flemming, J., Nielsen, A., Petris, G., and Thomas, L.
+  (2021).
+\newblock A guide to state–space modeling of ecological time series.
+\newblock {\em Ecological Monographs}, 91(4):e01470.
+
+\bibitem[Brooks et~al., 2011]{HMCMC2011}
+Brooks, S., Gelman, A., Jones, G.~L., and Meng, X.-L., editors (2011).
+\newblock {\em Handbook of Markov Chain Monte Carlo}.
+\newblock Chapman and Hall/CRC Press, 1st edition.
+
+\bibitem[{de Valpine} et~al., 2026]{NIMBLE}
+{de Valpine}, P., Paciorek, C., Turek, D., Michaud, N., Anderson-Bergman, C.,
+  Obermeyer, F., {Wehrhahn Cortes}, C., Rodrìguez, A., {Temple Lang}, D., and
+  Paganin, S. (2026).
+\newblock {\em {NIMBLE}: {MCMC}, Particle Filtering, and Programmable
+  Hierarchical Modeling}.
+\newblock {R} package version 1.4.2.
+
+\bibitem[{de Valpine} et~al., 2017]{NIMBLEpaper}
+{de Valpine}, P., Turek, D., Paciorek, C., Anderson-Bergman, C., {Temple Lang},
+  D., and Bodik, R. (2017).
+\newblock Programming with models: writing statistical algorithms for general
+  model structures with {NIMBLE}.
+\newblock {\em Journal of Computational and Graphical Statistics}, 26:403--413.
+
+\bibitem[Gabry et~al., 2025]{cmdstanr}
+Gabry, J., Češnovar, R., Johnson, A., and Bronder, S. (2025).
+\newblock {\em cmdstanr: R Interface to 'CmdStan'}.
+\newblock R package version 0.9.0.
+
+\bibitem[Gelman et~al., 2014]{BDA2014}
+Gelman, A., Carlin, J.~B., Stern, H.~S., Dunson, D.~B., Vehtari, A., and Rubin,
+  D.~B. (2014).
+\newblock {\em Bayesian Data Analysis}.
+\newblock Chapman and Hall/CRC Press, 3rd edition.
+
+\bibitem[Lunn et~al., 2012]{BUGSbook}
+Lunn, D., Jackson, C., Best, N., Thomas, A., and Spiegelhalter, D. (2012).
+\newblock {\em {The BUGS Book: A Practical Introduction to Bayesian Analysis}}.
+\newblock Chapman and Hall/CRC Press, 1st edition.
+
 \bibitem[Maa et~al., 1996]{Maa&etal1996}
 Maa, J.-F., Pearl, D.~K., and Bartoszy\'nski, R. (1996).
 \newblock Reducing multidimensional two-sample data to one-dimensional
   interpoint comparisons.
 \newblock {\em The Annals of Statistics}, 24(3):1069--1074.
+
+\bibitem[Monnahan et~al., 2017]{Monnahan2017}
+Monnahan, C.~C., Thorson, J.~T., and Branch, T.~A. (2017).
+\newblock Faster estimation of bayesian models in ecology using hamiltonian
+  monte carlo.
+\newblock {\em Methods in Ecology and Evolution}, 8(3):339--348.
+
+\bibitem[Neal, 2011]{N2011}
+Neal, R.~M. (2011).
+\newblock {MCMC} using {H}amiltonian dynamics.
+\newblock In Brooks, S., Gelman, A., Jones, G.~L., and Meng, X.-L., editors,
+  {\em Handbook of Markov Chain Monte Carlo}, pages 113--162. CRC Press.
+
+\bibitem[Plummer, 2003]{JAGS2003}
+Plummer, M. (2003).
+\newblock {JAGS}: A program for analysis of bayesian graphical models using
+  gibbs sampling.
+\newblock In {\em Proceedings of the 3rd International Workshop on Distributed
+  Statistical Computing (DSC 2003)}, Vienna, Austria.
+
+\bibitem[{R Core Team}, 2026]{R2026}
+{R Core Team} (2026).
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\bibitem[{Stan Development Team}, 2026]{Stan2026}
+{Stan Development Team} (2026).
+\newblock {\em Stan User’s Guide}.
+\newblock Version 2.39.0.
 
 \end{thebibliography}

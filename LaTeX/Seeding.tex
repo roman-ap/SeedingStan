@@ -13,7 +13,7 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=red,citecolor=blue,filecolor=magenta,urlcolor=green}
 
-\title{Seeding Monte Carlo algorithms}
+\title{Seeding Markov Chain Monte Carlo algorithms}
 \author{
   Guti\'errez-Pe\~na, Eduardo\\
   \texttt{eduardo@sigma.iimas.unam.mx}
@@ -27,22 +27,31 @@
 \maketitle
 
 \begin{abstract}
-The primary goal of this work is to illustrate the need of seeding Monte Carlo algorithms when dealing with unobserved variables.  
+The purpose of this work is to illustrate the need of seeding Markov Chain Monte Carlo algorithms when dealing with unobserved variables, as well as to propose a seeding procedure based on a distance-based approach for such instances.  
 \end{abstract}
 
 \section{Introduction}
-In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a statistical perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing such a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism. Within the Bayesian approach, we further elicitate a propobalistic distribution for $\boldsymbol{\theta}$, say $\pi(\boldsymbol{\theta})$.\\
+In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a statistical perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing such a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism. Within the Bayesian approach \citep[see]{BDA2014}, we further elicitate a probobalistic distribution for $\boldsymbol{\theta}$, say $\pi(\boldsymbol{\theta})$. \\
 
-\section{Literature Review}
+We... Section~\ref{sec:background}. We then address this issue in Section~\ref{sec:alg} where we describe the proposed algorithm for seeding, whereas in Section~\ref{sec:sim} we illustrate the situation with a case study using the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}. Finally, in Section~\ref{sec:summary} we conclude with....
 
-\citet{Maa&etal1996}
+\section{MCMC in practice}
+\label{sec:background}
 
-\section{Methodology}
+Markov Chain Monte Carlo (MCMC) methods \citep{HMCMC2011} are widely used in practice for reconstructing the posterior distribution $\pi(\boldsymbol{\theta} \vert \mathbf{z})$. (Here we explain how they are implemented).\\
 
-Monte Carlo methods, such as MCMC and HMC, are widely used in practice for reconstructing the posterior distribution $\pi(\boldsymbol{\theta} \vert \mathbf{z})$. (Here we explain how they are implemented). A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Leveraring a distance-based approach in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
+Bayesian Inference Using Gibbs Sampling (BUGS) \citep{BUGSbook} and Just Another Gibbs Sampler (JAGS) \citep{JAGS2003}.\\
+
+Hamiltonian Monte Carlo (HMC) \citep{N2011} is the workhorse of the $\mathsf{Stan}$ software \citep{Stan2026}. 
+On the other hand, the NIMBLE system \cite{NIMBLEpaper}.
+
+\section{Seeding MCMC algorithms}
+\label{sec:alg}
+ 
+A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Leveraring a distance-based approach \citep{Maa&etal1996} in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
 
 
-Algorithm~\ref{alg:inits} summaries such a seeding process.
+$d:\mathcal{Y}\times\mathcal{Y}\rightarrow\mathbb{R}$ is a pseudo-distance.  Algorithm~\ref{alg:inits} summaries such a seeding process.
 
 \begin{algorithm}
 \caption{Distance-based Seeding}
@@ -63,7 +72,10 @@ Algorithm~\ref{alg:inits} summaries such a seeding process.
 \end{algorithmic}
 \end{algorithm}
 
-\section{Simulations}
+\section{Case study: Population with exponential growth}
+\label{sec:sim}
+
+\citet{AugerMethe2021} provides an overview of Bayesian methods in Ecology, whereas \citet{Monnahan2017} propose to use HMC for making inference.\\
 
 For a discrete-time setting, let us assume that a population experience an exponential growth with time-varying rate $r_{t}$, that is, $N_{t+1}=e^{r_{t}}N_{t}$ for $t=1,2,\ldots,T-1$. We can rewrite the time-varying rate as $r_{t}=f_{t}-m_{t}$, where $f_{t},m_{t}\in\mathbb{R}^{+}$ are the fertility and mortality rates at time $t$, respectively. Now, at each time $t$, we can think of abundance before and after mortality, say $N^{pre}_{t}$ and $N^{post}_{t}$, respectively. Thus, if $M_{t}$ denotes the total mortality we have that $N_{t}^{post}=N_{t}^{pre} - M_{t}$.
 
@@ -92,7 +104,10 @@ with
 \sigma_{lf} &\sim \mathrm{N}\left( 0, sd_{lf} \right)\\
 \end{align*}
 
+The $\mathsf{R}$ project \citep{R2026}.\\
+
 \section{Concluding Remarks}
+\label{sec:summary}
 
 
 \bibliographystyle{apalike}

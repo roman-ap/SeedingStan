@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.6.22)  9 JUL 2026 21:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.6.22)  11 JUL 2026 20:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -408,7 +408,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 34--35
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 42--43
+Underfull \hbox (badness 10000) in paragraph at lines 41--42
 
  []
 
@@ -417,28 +417,51 @@ Underfull \hbox (badness 10000) in paragraph at lines 42--43
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Underfull \hbox (badness 10000) in paragraph at lines 43--44
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--52
+
+ []
+
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 48.
+put line 57.
+
+Underfull \hbox (badness 10000) in paragraph at lines 78--79
+
+ []
 
 
-[2] (./Seeding.bbl)
 
-[3] (./Seeding.aux)
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+
+ []
+
+(./Seeding.bbl
+
+[3]
+
+[4])
+
+[5] (./Seeding.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `Seeding.out' has not changed.
-(rerunfilecheck)             Checksum: 54FA4FD289CE8C31E7EABDED9099B2B5;566.
+(rerunfilecheck)             Checksum: B86BF3B4AEB880C549E9759AA0D49615;820.
  ) 
 Here is how much of TeX's memory you used:
- 10913 strings out of 475060
- 164784 string characters out of 5763797
- 561806 words of memory out of 5000000
- 33762 multiletter control sequences out of 15000+600000
- 570879 words of font info for 81 fonts, out of 8000000 for 9000
+ 10973 strings out of 475060
+ 165658 string characters out of 5763797
+ 564423 words of memory out of 5000000
+ 33806 multiletter control sequences out of 15000+600000
+ 571786 words of font info for 84 fonts, out of 8000000 for 9000
  81 hyphenation exceptions out of 8191
- 75i,10n,79p,798b,451s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,662b,570s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
@@ -450,15 +473,16 @@ t/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts
 c/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
 nts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
 cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb
-></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/
-texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Seeding.pdf (3 pages, 179157 bytes).
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr
+/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on Seeding.pdf (5 pages, 204553 bytes).
 PDF statistics:
- 135 PDF objects out of 1000 (max. 8388607)
- 95 compressed objects within 1 object stream
- 12 named destinations out of 1000 (max. 500000)
+ 193 PDF objects out of 1000 (max. 8388607)
+ 148 compressed objects within 2 object streams
+ 26 named destinations out of 1000 (max. 500000)
  41 words of extra memory for PDF output out of 10000 (max. 10000000)
 
