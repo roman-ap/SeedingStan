@@ -7,6 +7,11 @@ Auger-Méthé, M., Newman, K., Cole, D., Empacher, F., Gryba, R., King, A.~A.,
 \newblock A guide to state–space modeling of ecological time series.
 \newblock {\em Ecological Monographs}, 91(4):e01470.
 
+\bibitem[Bernardo and Smith, 1994]{BS1994}
+Bernardo, J.~M. and Smith, A. F.~M. (1994).
+\newblock {\em Bayesian Theory}.
+\newblock Wiley.
+
 \bibitem[Brooks et~al., 2011]{HMCMC2011}
 Brooks, S., Gelman, A., Jones, G.~L., and Meng, X.-L., editors (2011).
 \newblock {\em Handbook of Markov Chain Monte Carlo}.
@@ -32,12 +37,6 @@ Gabry, J., Češnovar, R., Johnson, A., and Bronder, S. (2025).
 \newblock {\em cmdstanr: R Interface to 'CmdStan'}.
 \newblock R package version 0.9.0.
 
-\bibitem[Gelman et~al., 2014]{BDA2014}
-Gelman, A., Carlin, J.~B., Stern, H.~S., Dunson, D.~B., Vehtari, A., and Rubin,
-  D.~B. (2014).
-\newblock {\em Bayesian Data Analysis}.
-\newblock Chapman and Hall/CRC Press, 3rd edition.
-
 \bibitem[Lunn et~al., 2012]{BUGSbook}
 Lunn, D., Jackson, C., Best, N., Thomas, A., and Spiegelhalter, D. (2012).
 \newblock {\em {The BUGS Book: A Practical Introduction to Bayesian Analysis}}.
@@ -48,6 +47,11 @@ Maa, J.-F., Pearl, D.~K., and Bartoszy\'nski, R. (1996).
 \newblock Reducing multidimensional two-sample data to one-dimensional
   interpoint comparisons.
 \newblock {\em The Annals of Statistics}, 24(3):1069--1074.
+
+\bibitem[Meyn and Tweedie, 2009]{MT2009}
+Meyn, S. and Tweedie, R. (2009).
+\newblock {\em Markov Chains and Stochastic Stability}.
+\newblock Cambridge University Press, 2nd edition.
 
 \bibitem[Monnahan et~al., 2017]{Monnahan2017}
 Monnahan, C.~C., Thorson, J.~T., and Branch, T.~A. (2017).

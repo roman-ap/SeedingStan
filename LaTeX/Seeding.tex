@@ -31,24 +31,28 @@ The purpose of this work is to illustrate the need of seeding Markov Chain Monte
 \end{abstract}
 
 \section{Introduction}
-In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a statistical perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing such a phenomenon of interest, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is a set of attributes and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism. Within the Bayesian approach \citep[see]{BDA2014}, we further elicitate a probobalistic distribution for $\boldsymbol{\theta}$, say $\pi(\boldsymbol{\theta})$. \\
+In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a probabilistic perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing the phenomenon of interest in such a way that the outcomes of such a stochastic mechanism can be regarded as realisations of the set of traits, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is the set of traits of interest and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism.\\
 
-We... Section~\ref{sec:background}. We then address this issue in Section~\ref{sec:alg} where we describe the proposed algorithm for seeding, whereas in Section~\ref{sec:sim} we illustrate the situation with a case study using the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}. Finally, in Section~\ref{sec:summary} we conclude with....
+The aforementioned proposal is the core of Statistics, a probabilistic framework for drawing statements about the set of traits by leveraging available measurements of them, say $\mathbf{z}_{1}$, $\mathbf{z}_{2}$, $\ldots$, $\mathbf{z}_{N}$, and denoted by $\mathbf{z}_{1:N}$. In this context, there are two approaches that prevail. On the one hand, the frequentist approach focuses on estimating $\boldsymbol{\theta}$, say $\boldsymbol{\hat{\theta}}$. On the other hand, the Bayesian approach \citep{BS1994} requires the elicitation of $\pi(\boldsymbol{\theta})$, also known as the prior distribution, but returns via Bayes' rule $\pi(\boldsymbol{\theta} \vert \mathbf{z}_{1:N})$, also known as the posterior distribution.\\
+
+We provide a brief overview of the current state-of-the-art MCMC software in Section~\ref{sec:background}. We then address the problem of seeding MCMC algorithms when dealing with unobserved variables and describe the proposed seeding algorithm for overcoming such scenarios in Section~\ref{sec:alg}, whereas in Section~\ref{sec:sim} we illustrate it with a case study of Ecology using the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}. Finally, in Section~\ref{sec:summary} we conclude with....
 
 \section{MCMC in practice}
 \label{sec:background}
 
-Markov Chain Monte Carlo (MCMC) methods \citep{HMCMC2011} are widely used in practice for reconstructing the posterior distribution $\pi(\boldsymbol{\theta} \vert \mathbf{z})$. (Here we explain how they are implemented).\\
+Markov Chain Monte Carlo (MCMC) methods \citep{HMCMC2011} are widely used in practice for reconstructing posterior distributions. These methods rely on the theoretical principle of defining a homogeneous, Harris recurrent, and aperiodic Markov chain whose stationary probability density function is the target posterior distribution, that is, to construct a suitable Markov chain $\tilde{\boldsymbol{\theta}}^{(1)}, \tilde{\boldsymbol{\theta}}^{(2)}, \ldots$ such that $\tilde{\boldsymbol{\theta}}^{(t)} \underset{t \to \infty}{\sim} \pi(\boldsymbol{\theta} \vert \mathbf{z}_{1:N})$. See \cite{MT2009} for a concise treatment of the theory of Markov chains.\\
 
-Bayesian Inference Using Gibbs Sampling (BUGS) \citep{BUGSbook} and Just Another Gibbs Sampler (JAGS) \citep{JAGS2003}.\\
+Historically, the BUGS project \citep{BUGSbook} led the efforts to enable Bayesian methods  and JAGS \citep{JAGS2003} as one BUGS engine.\\
 
-Hamiltonian Monte Carlo (HMC) \citep{N2011} is the workhorse of the $\mathsf{Stan}$ software \citep{Stan2026}. 
-On the other hand, the NIMBLE system \cite{NIMBLEpaper}.
+Lately, Hamiltonian Monte Carlo (HMC) methods \citep{N2011} have became an alternative to MCMC methods.\\
+
+HMC is the workhorse of the $\mathsf{Stan}$ software \citep{Stan2026}. 
+On the other hand, the NIMBLE system \citep{NIMBLEpaper}.
 
 \section{Seeding MCMC algorithms}
 \label{sec:alg}
  
-A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Leveraring a distance-based approach \citep{Maa&etal1996} in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
+A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Built upon a distance-based approach \citep{Maa&etal1996} in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
 
 
 $d:\mathcal{Y}\times\mathcal{Y}\rightarrow\mathbb{R}$ is a pseudo-distance.  Algorithm~\ref{alg:inits} summaries such a seeding process.
