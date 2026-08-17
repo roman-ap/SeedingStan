@@ -27,20 +27,25 @@
 \maketitle
 
 \begin{abstract}
-The purpose of this work is to illustrate the need of seeding Markov Chain Monte Carlo algorithms when dealing with unobserved variables, as well as to propose a seeding procedure based on a distance-based approach for such instances.  
+The purpose of this work is to discuss and illustrate the need of seeding Markov Chain Monte Carlo algorithms when dealing with unobserved variables, as well as to propose a seeding procedure that relies on a distance-based approach for such cases.  
 \end{abstract}
 
 \section{Introduction}
-In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a probabilistic perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing the phenomenon of interest in such a way that the outcomes of such a stochastic mechanism can be regarded as realisations of the set of traits, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\mathbf{z}$ is the set of traits of interest and $\boldsymbol{\theta}$ is a random vector that fully defines the proposed stochastic mechanism.\\
+In real-world scenarios, we often aim to explain a set of traits of a phenomenon of interest under specific conditions. From a probabilistic perspective, we usually propose a stochastic mechanism to approximate the underlying law that is governing the phenomenon of interest in such a way that the outcomes of such a stochastic mechanism can be regarded as realisations of the set of traits, say $\pi(\mathbf{z} \vert \boldsymbol{\theta})$, where $\boldsymbol{\theta}$ is an unobservable random vector that fully defines the proposed stochastic mechanism.\\
 
-The aforementioned proposal is the core of Statistics, a probabilistic framework for drawing statements about the set of traits by leveraging available measurements of them, say $\mathbf{z}_{1}$, $\mathbf{z}_{2}$, $\ldots$, $\mathbf{z}_{N}$, and denoted by $\mathbf{z}_{1:N}$. In this context, there are two approaches that prevail. On the one hand, the frequentist approach focuses on estimating $\boldsymbol{\theta}$, say $\boldsymbol{\hat{\theta}}$. On the other hand, the Bayesian approach \citep{BS1994} requires the elicitation of $\pi(\boldsymbol{\theta})$, also known as the prior distribution, but returns via Bayes' rule $\pi(\boldsymbol{\theta} \vert \mathbf{z}_{1:N})$, also known as the posterior distribution.\\
+The aforementioned proposal is the core of Statistics, a probabilistic framework for drawing statements about the set of traits by leveraging available measurements $\mathbf{z}_{1}$, $\mathbf{z}_{2}$, $\ldots$, $\mathbf{z}_{N}$ of them, here denoted by $\mathbf{z}^{obs}$. In this context, there are two common approaches. On the one hand, the frequentist approach focuses on estimating $\boldsymbol{\theta}$, say $\boldsymbol{\widehat{\theta}}$. On the other hand, the Bayesian approach \citep{BS1994} requires the elicitation of $\pi(\boldsymbol{\theta})$, also known as the prior distribution, but returns (via Bayes' rule) $\pi(\boldsymbol{\theta} \vert \mathbf{z}^{obs})$, also known as the posterior distribution.\\
 
-We provide a brief overview of the current state-of-the-art MCMC software in Section~\ref{sec:background}. We then address the problem of seeding MCMC algorithms when dealing with unobserved variables and describe the proposed seeding algorithm for overcoming such scenarios in Section~\ref{sec:alg}, whereas in Section~\ref{sec:sim} we illustrate it with a case study of Ecology using the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}. Finally, in Section~\ref{sec:summary} we conclude with....
+[IN THIS PARAGRAPH WE SHOULD JUSTIFY OUR (BAYESIAN) APPROACH.]\\
+
+Except for very simple cases, computing and working with the posterior distribution requires numerical methods. These methods are mostly needed to compute expected values with respect to the posterior distribution, so the main problem is computing (or approximating) integrals. Traditional analytical methods, such as the Laplace approximation [REFERENCE] and classical numerical methods, such as quadrature [REFERENCE], have proved to be adequate in a wide range of problems, but do not necessarily scale well. For high dimensional posterior distributions, Markon chain Monte Carlo (MCMC) methods are usually preferred [REFERENCE]. MCMC also makes it possible to deal with latent (unobservable) variables, random effects and missing data.\\
+
+In the next section, we provide a brief overview of the current state-of-the-art MCMC software. %in Section~\ref{sec:background}.
+We then address the problem of seeding MCMC algorithms when dealing with unobserved variables, and describe the proposed seeding algorithm for overcoming such scenarios in Section~\ref{sec:alg}, whereas in Section~\ref{sec:sim} we illustrate it with a case study of Ecology using the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}. Finally, in Section~\ref{sec:summary} we present some concluding remarks.
 
 \section{MCMC in practice}
 \label{sec:background}
 
-Markov Chain Monte Carlo (MCMC) methods \citep{HMCMC2011} are widely used in practice for reconstructing posterior distributions. These methods rely on the theoretical principle of defining a homogeneous, Harris recurrent, and aperiodic Markov chain whose stationary probability density function is the target posterior distribution, that is, to construct a suitable Markov chain $\tilde{\boldsymbol{\theta}}^{(1)}, \tilde{\boldsymbol{\theta}}^{(2)}, \ldots$ such that $\tilde{\boldsymbol{\theta}}^{(t)} \underset{t \to \infty}{\sim} \pi(\boldsymbol{\theta} \vert \mathbf{z}_{1:N})$. See \cite{MT2009} for a concise treatment of the theory of Markov chains.\\
+Markov Chain Monte Carlo (MCMC) methods \citep{HMCMC2011} are widely used in practice for reconstructing posterior distributions. These methods rely on the theoretical principle of defining a homogeneous, Harris-recurrent, and aperiodic Markov chain whose stationary probability density function is the target posterior distribution; that is, to construct a suitable Markov chain $\tilde{\boldsymbol{\theta}}^{(1)}, \tilde{\boldsymbol{\theta}}^{(2)}, \ldots$ such that $\tilde{\boldsymbol{\theta}}^{(t)} \underset{t \to \infty}{\sim} \pi(\boldsymbol{\theta} \vert \mathbf{z}_{1:N})$. See \cite{MT2009} for a concise treatment of the theory of Markov chains.\\
 
 Historically, the BUGS project \citep{BUGSbook} led the efforts to enable Bayesian methods  and JAGS \citep{JAGS2003} as one BUGS engine.\\
 
@@ -52,34 +57,46 @@ On the other hand, the NIMBLE system \citep{NIMBLEpaper}.
 \section{Seeding MCMC algorithms}
 \label{sec:alg}
  
-A more challenging scenario is when we only observed a subset of $\mathbf{z}$, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we now also have to initialise $\mathbf{x}$. Built upon a distance-based approach \citep{Maa&etal1996} in tandem with the prior predictive distribution, we proposed the following seeding process for Monte Carlo algorithms when dealing with unobserved variables.\\  
+\subsection{Motivation}
 
+A more challenging scenario is when, despite having a well-defined stochastic mechanism, the set of traits is comprised of unobservable and observable variables, that is, if $\mathbf{z} = (\mathbf{x}, \mathbf{y})$ we only have measurements for $\mathbf{y}$, say $\mathbf{y}^{obs}$. At first sight this might seem far-fetched, however, it is precisely the setting of state-space models, where the state vector is unobservable and the output vector is observable. In this case, we instead seek to reconstruct $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, and thus, we have not only initialise $\boldsymbol{\theta}$ but also $\mathbf{x}$. Built upon a distance-based approach, we proposed the following seeding process for MCMC algorithms when dealing with unobserved variables.
 
-$d:\mathcal{Y}\times\mathcal{Y}\rightarrow\mathbb{R}$ is a pseudo-distance.  Algorithm~\ref{alg:inits} summaries such a seeding process.
+\subsection{Algorithm}
+
+Given a prior distribution for $\boldsymbol{\theta}$, $\pi(\boldsymbol{\theta})$, we start by drawing a sample from it, say $\boldsymbol{\theta}^{(t)}$. Next, we simulate a realisation of $\pi(\mathbf{x}, \mathbf{y} \vert \boldsymbol{\theta}^{(t)})$, say $(\mathbf{x}^{(t)}, \mathbf{y}^{(t)})$, which can be regarded as a candidate measurement of the full set of traits $\mathbf{z}$. Now, let $d:\mathcal{Y}\times\mathcal{Y}\rightarrow\mathbb{R}$ be a distance function and $d^{max}$ a distance threshold. We can argument that the candidate measurement $\mathbf{y}^{(t)}$ is at the bulk of $\pi(\mathbf{y})$ if $d(\mathbf{y}^{(t)}, \mathbf{y}^{obs}) < d^{max}$. In that case, we can also argument that the candidate measurement $\mathbf{x}^{(t)}$ is at the bulk of $\pi(\mathbf{x})$. We thus have a potential initial value for the MCMC algorithm that can help us with reconstructing $\pi(\mathbf{x}, \boldsymbol{\theta} \vert \mathbf{y}^{obs})$, namely, $(\boldsymbol{\theta}^{(t)}, \mathbf{x}^{(t)})$. Algorithm~\ref{alg:inits} summaries such a seeding process.
 
 \begin{algorithm}
-\caption{Distance-based Seeding}
+\caption{Distance-based seeding process}
 \label{alg:inits}
 \begin{algorithmic}[1]
 
+\Require (Set) $d^{max}$
 \Require $\boldsymbol{\theta}^{(t)}$
-\Ensure $\boldsymbol{\theta}^{(t)}, \mathbf{x}^{(t)}, \mathbf{y}^{(t)}$
+\Ensure $\boldsymbol{\theta}^{(t)}, \mathbf{x}^{(t)}$
 
 \State $t = 0$
 
 \Repeat
 	\State $t \leftarrow t+1$
 	\State $\boldsymbol{\theta}^{(t)} \sim \pi(\boldsymbol{\theta})$
-    \State $\mathbf{x}^{(t)}, \mathbf{y}^{(t)} \sim \pi(\mathbf{x}, \mathbf{y} \vert \boldsymbol{\theta})$
+    \State $\mathbf{x}^{(t)}, \mathbf{y}^{(t)} \sim \pi(\mathbf{x}, \mathbf{y} \vert \boldsymbol{\theta}^{(t)})$
+    
 \Until{$d(\mathbf{y}^{(t)}, \mathbf{y}^{obs}) < d^{max}$}
+
+\Return $\boldsymbol{\theta}^{(t)}, \mathbf{x}^{(t)}$
 
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Discussion}
+
+The proposed seeding process relies on two principles: $\mathit{(i)}$ to leverage the prior predictive distribution for exploring the parameter space $(\mathbf{x}, \boldsymbol{\theta})$, and $\mathit{(ii)}$ to use \cite{Maa&etal1996}.
+
+
 \section{Case study: Population with exponential growth}
 \label{sec:sim}
 
-\citet{AugerMethe2021} provides an overview of Bayesian methods in Ecology, whereas \citet{Monnahan2017} propose to use HMC for making inference.\\
+\citet{AugerMethe2021} provide an overview of Bayesian methods in Ecology, whereas \citet{Monnahan2017} propose to use HMC for making inference.\\
 
 For a discrete-time setting, let us assume that a population experience an exponential growth with time-varying rate $r_{t}$, that is, $N_{t+1}=e^{r_{t}}N_{t}$ for $t=1,2,\ldots,T-1$. We can rewrite the time-varying rate as $r_{t}=f_{t}-m_{t}$, where $f_{t},m_{t}\in\mathbb{R}^{+}$ are the fertility and mortality rates at time $t$, respectively. Now, at each time $t$, we can think of abundance before and after mortality, say $N^{pre}_{t}$ and $N^{post}_{t}$, respectively. Thus, if $M_{t}$ denotes the total mortality we have that $N_{t}^{post}=N_{t}^{pre} - M_{t}$.
 
@@ -110,7 +127,7 @@ with
 
 The $\mathsf{R}$ project \citep{R2026}.\\
 
-\section{Concluding Remarks}
+\section{Concluding remarks}
 \label{sec:summary}
 
 
