@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.6.22)  16 AUG 2026 20:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.6.22)  25 AUG 2026 21:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -454,13 +454,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 99--100
  []
 
 
-
-[4]
-Underfull \hbox (badness 10000) in paragraph at lines 128--129
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
 
  []
 
-(./Seeding.bbl
+
+
+[4] (./Seeding.bbl
 
 [5])
 
@@ -470,16 +470,16 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `Seeding.out' has not changed.
-(rerunfilecheck)             Checksum: 8505CD535A47674EC17BD542AC3B6524;1136.
+(rerunfilecheck)             Checksum: 3E4586D0CE2BA8F78EFAAC5CA99C1091;1442.
  ) 
 Here is how much of TeX's memory you used:
- 10989 strings out of 475060
- 165858 string characters out of 5763797
- 562454 words of memory out of 5000000
- 33815 multiletter control sequences out of 15000+600000
- 572794 words of font info for 87 fonts, out of 8000000 for 9000
+ 10996 strings out of 475060
+ 165963 string characters out of 5763797
+ 563457 words of memory out of 5000000
+ 33819 multiletter control sequences out of 15000+600000
+ 572963 words of font info for 88 fonts, out of 8000000 for 9000
  81 hyphenation exceptions out of 8191
- 75i,10n,79p,1095b,566s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,1095b,559s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
@@ -497,10 +497,10 @@ cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Seeding.pdf (6 pages, 211372 bytes).
+Output written on Seeding.pdf (6 pages, 213949 bytes).
 PDF statistics:
- 212 PDF objects out of 1000 (max. 8388607)
- 166 compressed objects within 2 object streams
- 31 named destinations out of 1000 (max. 500000)
- 65 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 229 PDF objects out of 1000 (max. 8388607)
+ 183 compressed objects within 2 object streams
+ 34 named destinations out of 1000 (max. 500000)
+ 89 words of extra memory for PDF output out of 10000 (max. 10000000)
 

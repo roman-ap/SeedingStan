@@ -90,15 +90,19 @@ Given a prior distribution for $\boldsymbol{\theta}$, $\pi(\boldsymbol{\theta})$
 
 \subsection{Discussion}
 
-The proposed seeding process relies on two principles: $\mathit{(i)}$ to leverage the prior predictive distribution for exploring the parameter space $(\mathbf{x}, \boldsymbol{\theta})$, and $\mathit{(ii)}$ to use \cite{Maa&etal1996}.
+The proposed seeding process relies on two ideas: $\mathit{(i)}$ to draw samples from the prior predictive distribution for simulating realisations of $(\mathbf{x}, \boldsymbol{\theta})$, and $\mathit{(ii)}$ to use the results of \cite{Maa&etal1996} for assessing when those simulated realisations are somehow close to the mode of $\pi(\mathbf{y}^{obs} \vert \mathbf{x}, \boldsymbol{\theta})$.
 
 
 \section{Case study: Population with exponential growth}
 \label{sec:sim}
 
-\citet{AugerMethe2021} provide an overview of Bayesian methods in Ecology, whereas \citet{Monnahan2017} propose to use HMC for making inference.\\
+As we have mentioned above, in state-space models there are both unobserved and observed variables. We thus illustrate the need of seeding MCMC algorithms when dealing with unobserved variables with a case study of Ecology in which the proposed stochastic mechanism is formulated as a state-space model, namely population growth with an exponential rate. The implementation was carried out in $\mathsf{R}$ \citep{R2026} and for reproducibility purposes the code is available at \url{https://github.com/roman-ap/SeedingStan}.\\
 
-For a discrete-time setting, let us assume that a population experience an exponential growth with time-varying rate $r_{t}$, that is, $N_{t+1}=e^{r_{t}}N_{t}$ for $t=1,2,\ldots,T-1$. We can rewrite the time-varying rate as $r_{t}=f_{t}-m_{t}$, where $f_{t},m_{t}\in\mathbb{R}^{+}$ are the fertility and mortality rates at time $t$, respectively. Now, at each time $t$, we can think of abundance before and after mortality, say $N^{pre}_{t}$ and $N^{post}_{t}$, respectively. Thus, if $M_{t}$ denotes the total mortality we have that $N_{t}^{post}=N_{t}^{pre} - M_{t}$.
+\citet{AugerMethe2021} outline how state-space models can be adopted for modelling ecological time series, including the advantages and disadvantages of using a Bayesian approach. On the other hand, \citet{Monnahan2017} propose to use HMC for mitigating the computational burden of traditional MCMC algorithms when dealing with complex Bayesian models for ecological data. We will use both traditional MCMC and HMC algorithms with the assistance of the $\mathsf{R}$ packages $\mathbf{NIMBLE}$ \citep{NIMBLE} and $\mathbf{cmdstanr}$ \citep{cmdstanr}, respectively.
+
+\subsection{Model}  
+
+For a discrete-time setting, let us assume that a population experience an exponential growth with time-varying rate $r_{t}$, that is, $N_{t+1}=e^{r_{t}}N_{t}$ for $t=1,2,\ldots,T-1$. We can rewrite the time-varying rate as $r_{t}=f_{t}-m_{t}$, where $f_{t},m_{t}\in\mathbb{R}^{+}$ are the fertility and mortality rates at time $t$, respectively. Now, at each time $t$, we can think of abundance before and after mortality, say $N^{pre}_{t}$ and $N^{post}_{t}$, respectively. Thus, if $M_{t}$ denotes the total mortality we have that $N_{t}^{post}=N_{t}^{pre} - M_{t}$.\\
 
 Given the aforementioned population demographics, we can propose the following stochastic population mechanism:
 
@@ -125,7 +129,9 @@ with
 \sigma_{lf} &\sim \mathrm{N}\left( 0, sd_{lf} \right)\\
 \end{align*}
 
-The $\mathsf{R}$ project \citep{R2026}.\\
+\subsection{Simulated data}
+
+\subsection{Results}
 
 \section{Concluding remarks}
 \label{sec:summary}
