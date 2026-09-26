@@ -20,7 +20,7 @@ parameters {
   vector[T] lmr_raw;
   real mu_lmr;
   real<lower=0> sigma_lmr;
-  vector[T] lfr_raw;
+  vector[T-1] lfr_raw;
   real mu_lfr;
   real<lower=0> sigma_lfr;
 }
@@ -32,8 +32,8 @@ transformed parameters{
   vector[T] Npost;
   vector[T] lmr;
   vector[T] mr;
-  vector[T] lfr;
-  vector[T] fr;
+  vector[T-1] lfr;
+  vector[T-1] fr;
   vector<lower=0>[T-1] meanandvar;
   vector[T-1] mulognormal;
   vector[T-1] sdlognormal;

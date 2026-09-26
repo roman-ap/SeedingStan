@@ -12,13 +12,13 @@ library(latex2exp)
 
 ##### Data simulation
 # Dimension
-Ty <- 10
+Ty <- 15
 # Objects for storing the simulated observations
 N0_obs=array(dim=1)
 mu_lmr_obs=sigma_lmr_obs=array(dim=1)
 lmr_raw_obs=lmr_obs=mr_obs=array(dim=Ty)
 mu_lfr_obs=sigma_lfr_obs=array(dim=1)
-lfr_raw_obs=lfr_obs=fr_obs=array(dim=Ty)
+lfr_raw_obs=lfr_obs=fr_obs=array(dim=(Ty-1))
 M_obs=array(dim=Ty)
 Npre_obs=array(dim=Ty) 
 Npost_obs=array(dim=Ty)
@@ -30,32 +30,32 @@ pm_mu_lmr = -1
 psd_mu_lmr = 0.1
 pm_sigma_lmr = 0
 psd_sigma_lmr = 0.05
-pm_mu_lfr = 0.7
+pm_mu_lfr = 0.5
 psd_mu_lfr = 0.1
 pm_sigma_lfr = 0
 psd_sigma_lfr = 0.05
 ### Realisation
-# Draw from the (hyper)priors such that A > 0
+# Draw from the (hyper)priors such that M > 0
 with_seed(87L,{
-  N0_obs <- rpois(n = 1, pm_N0)
+  N0_obs <- rpois(n = 1, exp(pm_LN0))
   lmr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lmr_obs <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
   sigma_lmr_obs <- rtnorm(n = 1, pm_sigma_lmr, psd_sigma_lmr, a=0)
   lmr_obs = mu_lmr_obs + sigma_lmr_obs*lmr_raw_obs
   mr_obs = exp(lmr_obs)
-  lfr_raw_obs <- rnorm(n = Ty, 0, 1)
+  lfr_raw_obs <- rnorm(n = (Ty-1), 0, 1)
   mu_lfr_obs <- rnorm(n = 1, pm_mu_lfr, psd_mu_lfr)
   sigma_lfr_obs <- rtnorm(n = 1, pm_sigma_lfr, psd_sigma_lfr, a=0)
   lfr_obs = mu_lfr_obs + sigma_lfr_obs*lfr_raw_obs
   fr_obs = exp(lfr_obs)
   for(t in 1:Ty){
     if(t==1){
-      Npre_obs[t]=N0_obs
+      Npre_obs[t] = N0_obs
     }
     else{
-      Npre_obs[t]=rpois(n = 1, fr_obs[t-1]*Npost_obs[t-1]) 
+      Npre_obs[t] <- rpois(n = 1, fr_obs[t-1]*Npost_obs[t-1]) 
     }
-    M_obs[t] = rbinom(n = 1, size = Npre_obs[t], prob = 1-exp(-mr_obs[t]))
+    M_obs[t] <- rbinom(n = 1, size = Npre_obs[t], prob = 1-exp(-mr_obs[t]))
     Npost_obs[t] = Npre_obs[t] - M_obs[t] 
   }
 })
@@ -223,11 +223,11 @@ fr_van <- ss_true_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_van_fr <- ggplot(fr_van, aes(x = 1:Ty, y = mean)) +
+gg_van_fr <- ggplot(fr_van, aes(x = 1:(Ty-1), y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
-  geom_point(aes(x = 1:Ty, y = fr_obs)) +
+  geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
   ylim(0, 4) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
@@ -424,11 +424,11 @@ fr_true <- ss_true_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_true_fr <- ggplot(fr_true, aes(x = 1:Ty, y = mean)) +
+gg_true_fr <- ggplot(fr_true, aes(x = 1:(Ty-1), y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
-  geom_point(aes(x = 1:Ty, y = fr_obs)) +
+  geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
   ylim(0, 4) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
@@ -675,7 +675,7 @@ ginit <- function(D, cutoff){
   mu_lmr_prip=sigma_lmr_prip=array(dim=D)
   lmr_raw_prip=mr_prip=array(dim=c(D,Ty))
   mu_lfr_prip=sigma_lfr_prip=array(dim=D)
-  lfr_raw_prip=fr_prip=array(dim=c(D,Ty))
+  lfr_raw_prip=fr_prip=array(dim=c(D,(Ty-1)))
   M_prip=array(dim=c(D,Ty))
   Npre_prip=array(dim=c(D,Ty)) 
   Npost_prip=array(dim=c(D,Ty))
@@ -690,7 +690,7 @@ ginit <- function(D, cutoff){
     mr_prip[d,] = exp(mu_lmr_prip[d] + sigma_lmr_prip[d]*lmr_raw_prip[d,])
     mu_lfr_prip[d] <- rnorm(n = 1, pm_mu_lfr, psd_mu_lfr)
     sigma_lfr_prip[d] <- rtnorm(n = 1, pm_sigma_lfr, psd_sigma_lfr, a=0)
-    lfr_raw_prip[d,] <- rnorm(n = Ty, 0, 1)
+    lfr_raw_prip[d,] <- rnorm(n = (Ty-1), 0, 1)
     fr_prip[d,] = exp(mu_lfr_prip[d] + sigma_lfr_prip[d]*lfr_raw_prip[d,])
     for(t in 1:Ty){
       if(t==1){
@@ -713,7 +713,7 @@ ginit <- function(D, cutoff){
   mu_lmr_pripm=sigma_lmr_pripm=array(dim=1)
   lmr_raw_pripm=mr_pripm=array(dim=Ty)
   mu_lfr_pripm=sigma_lfr_pripm=array(dim=1)
-  lfr_raw_pripm=fr_pripm=array(dim=Ty)
+  lfr_raw_pripm=fr_pripm=array(dim=(Ty-1))
   M_pripm=array(dim=Ty)
   Npre_pripm=array(dim=Ty) 
   Npost_pripm=array(dim=Ty)
@@ -723,7 +723,7 @@ ginit <- function(D, cutoff){
   sigma_lmr_pripm = mean(sigma_lmr_prip[good_draws])
   mu_lfr_pripm = mean(mu_lfr_prip[good_draws])
   sigma_lfr_pripm = mean(sigma_lfr_prip[good_draws])
-    for(t in 1:Ty){
+    for(t in 1:(Ty-1)){
       lmr_raw_pripm[t] = mean(lmr_raw_prip[good_draws,t])
       mr_pripm[t] = mean(mr_prip[good_draws,t])
       lfr_raw_pripm[t] = mean(lfr_raw_prip[good_draws,t])
@@ -732,6 +732,11 @@ ginit <- function(D, cutoff){
       Npost_pripm[t] = mean(Npost_prip[good_draws,t])
       Npre_pripm[t] = mean(Npre_prip[good_draws,t])
     }
+  lmr_raw_pripm[Ty] = mean(lmr_raw_prip[good_draws,Ty])
+  mr_pripm[Ty] = mean(mr_prip[good_draws,Ty])
+  M_pripm[Ty] = mean(M_prip[good_draws,Ty])
+  Npost_pripm[Ty] = mean(Npost_prip[good_draws,Ty])
+  Npre_pripm[Ty] = mean(Npre_prip[good_draws,Ty])
   return(
     list(
       N0_raw = Npre_pripm[1] - M_pripm[1],
@@ -787,7 +792,7 @@ robust_optimize <- function(stan_model, data, D, cutoff) {
 # Maximum a posteriori
 ss_map_seeded <- robust_optimize(ss_model,
                                  ss_data, 
-                                 D=1, cutoff=25000)
+                                 D=1, cutoff=1000)
 ss_map_seeded$summary(variables = c("N0", 
                                     "mu_lmr", "sigma_lmr", 
                                     "mu_lfr", "sigma_lfr"))
@@ -940,11 +945,11 @@ fr_seeded <- ss_seeded_draws |>
   arrange(index) |>
   select(-index)
 # Plots
-gg_seeded_fr <- ggplot(fr_seeded, aes(x = 1:Ty, y = mean)) +
+gg_seeded_fr <- ggplot(fr_seeded, aes(x = 1:(Ty-1), y = mean)) +
   geom_ribbon(aes(ymin = q2.5, ymax = q97.5), 
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
-  geom_point(aes(x = 1:Ty, y = fr_obs)) +
+  geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
   ylim(0, 4) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
