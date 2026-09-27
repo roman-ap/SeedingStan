@@ -37,7 +37,7 @@ psd_sigma_lfr = 0.05
 ### Realisation
 # Draw from the (hyper)priors such that M > 0
 with_seed(87L,{
-  N0_obs <- rpois(n = 1, exp(pm_LN0))
+  N0_obs <- rpois(n = 1, pm_N0)
   lmr_raw_obs <- rnorm(n = Ty, 0, 1)
   mu_lmr_obs <- rnorm(n = 1, pm_mu_lmr, psd_mu_lmr)
   sigma_lmr_obs <- rtnorm(n = 1, pm_sigma_lmr, psd_sigma_lmr, a=0)
@@ -97,7 +97,7 @@ ss_true_draws <- ss_van$draws(format = "df")
 gg_van_N0 <- ggplot(data.frame(draw=ss_true_draws$`N0`)) +
   geom_density(aes(x=draw, y=after_stat(density)), color="pink", fill="pink") +
   stat_function(fun = dlnorm, args = list(meanlog=pm_LN0, sdlog=psd_LN0), colour="black", linewidth=1) +
-  xlim(0, exp(pm_LN0+0.5*(psd_LN0**2)) + 3*sqrt((exp(psd_LN0**2)-1)*exp(2*pm_LN0+(psd_LN0**2)))) +
+  xlim(0, exp(pm_LN0+0.5*(psd_LN0**2)) + 5*sqrt((exp(psd_LN0**2)-1)*exp(2*pm_LN0+(psd_LN0**2)))) +
   geom_vline(xintercept = N0_obs, color="blue") +
   theme_minimal() +
   labs(title = TeX("Prior and posterior distribution of $N^{pre}_{1}$"),
@@ -185,7 +185,7 @@ gg_van_Npre <- ggplot(pre_abundancy_van, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npre_obs)) +
-  ylim(0, max(pre_abundancy_van$q97.5)) +
+  ylim(0, max(Npre_obs, pre_abundancy_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the pre-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -198,7 +198,7 @@ gg_van_Npost <- ggplot(post_abundancy_van, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npost_obs)) +
-  ylim(0, max(pre_abundancy_van$q97.5)) +
+  ylim(0, max(Npre_obs, pre_abundancy_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the post-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -228,7 +228,7 @@ gg_van_fr <- ggplot(fr_van, aes(x = 1:(Ty-1), y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
-  ylim(0, 4) +
+  ylim(0, max(fr_obs, fr_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
        y = TeX("Fertility rate"), x = "Year") +
@@ -257,7 +257,7 @@ gg_van_mr <- ggplot(mr_van, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = mr_obs)) +
-  ylim(0, 1) +
+  ylim(0, max(mr_obs, mr_van$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Mortality rates"),
        y = TeX("Mortality rate"), x = "Year") +
@@ -386,7 +386,7 @@ gg_true_Npre <- ggplot(pre_abundancy_true, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npre_obs)) +
-  ylim(0, max(pre_abundancy_true$q97.5)) +
+  ylim(0, max(Npre_obs, pre_abundancy_true$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the pre-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -399,7 +399,7 @@ gg_true_Npost <- ggplot(post_abundancy_true, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npost_obs)) +
-  ylim(0, max(pre_abundancy_true$q97.5)) +
+  ylim(0, max(Npost_obs, pre_abundancy_true$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the post-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -429,7 +429,7 @@ gg_true_fr <- ggplot(fr_true, aes(x = 1:(Ty-1), y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
-  ylim(0, 4) +
+  ylim(0, max(fr_obs, fr_true$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
        y = TeX("Fertility rate"), x = "Year") +
@@ -458,7 +458,7 @@ gg_true_mr <- ggplot(mr_true, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = mr_obs)) +
-  ylim(0, 1) +
+  ylim(0, max(mr_obs, mr_true$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Background mortality rates"),
        y = TeX("Background mortality rate"), x = "Year") +
@@ -665,7 +665,6 @@ gg_map_mr <- ggplot(mr_van, aes(x = 1:Ty, y = mean)) +
     plot.caption = element_text(size = 12, hjust = 1)
   )
 grid.arrange(gg_map_mr, nrow = 1, ncol = 1)
-
 
 ### Seeding Stan
 ## Functions for generating initial seeds 
@@ -907,7 +906,7 @@ gg_seeded_Npre <- ggplot(pre_abundancy_seeded, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npre_obs)) +
-  ylim(0, max(pre_abundancy_seeded$q97.5)) +
+  ylim(0, max(Npre_obs, pre_abundancy_seeded$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the pre-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -920,7 +919,7 @@ gg_seeded_Npost <- ggplot(post_abundancy_seeded, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = Npost_obs)) +
-  ylim(0, max(pre_abundancy_seeded$q97.5)) +
+  ylim(0, max(Npre_obs,pre_abundancy_seeded$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Posterior of the post-mortality population"),
        y = TeX("Total population"), x = "Year") +
@@ -950,7 +949,7 @@ gg_seeded_fr <- ggplot(fr_seeded, aes(x = 1:(Ty-1), y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:(Ty-1), y = fr_obs)) +
-  ylim(0, 4) +
+  ylim(0, max(fr_obs, fr_seeded$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Fertility rates"),
        y = TeX("Fertility rate"), x = "Year") +
@@ -979,7 +978,7 @@ gg_seeded_mr <- ggplot(mr_seeded, aes(x = 1:Ty, y = mean)) +
               fill = "pink", alpha = 0.5) +
   geom_line(color = "magenta", linewidth = 1) +
   geom_point(aes(x = 1:Ty, y = mr_obs)) +
-  ylim(0, 1) +
+  ylim(0, max(mr_obs, mr_seeded$q97.5)) +
   theme_minimal() +
   labs(title = TeX("Background mortality rates"),
        y = TeX("Background mortality rate"), x = "Year") +
